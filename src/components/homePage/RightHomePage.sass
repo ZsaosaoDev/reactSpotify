@@ -1,0 +1,137 @@
+.rightHomePage
+    height: 100%
+    position: absolute
+    top: 0
+    right: 0
+    width: calc(27% - 20px)
+    background-color: var(--black-lv2)
+    border-radius: 8px
+    transform: translateX(100%)
+    transition: transform 0.3s linear
+    overflow-y: scroll
+
+    &.rightActive
+        transform: translateX(0)
+
+    &::-webkit-scrollbar
+        display: none
+
+    .currentSongContainer
+        position: relative
+        width: 100%
+        overflow: hidden
+
+        .mediaContainer
+            position: relative
+
+            &::after
+                content: ""
+                position: absolute
+                left: 0
+                right: 0
+                bottom: -50px
+                height: 100px
+                background: linear-gradient(to bottom, var(--black-lv3) 0%, var(--black-lv2) 100%)
+
+            video, img.songImage
+                width: 100%
+                height: 600px
+                object-fit: cover
+
+            .headerSong
+                position: absolute
+                top: 20px
+                left: 20px
+                font-size: 16px
+                font-weight: 700
+                color: var(--white-lv1)
+                display: flex
+                align-items: center
+                gap: 10px
+                z-index: 2
+
+                .videoTitle, .imageTitle
+
+
+        .songInfoContainer
+            position: absolute
+            left: 50%
+            transform: translateX(-50%)
+            width: 100%
+            z-index: 2
+            padding: var(--padding-lv2)
+            top: 400px
+
+            .songTitleContainer
+                color: var(--white-lv1)
+                font-weight: 700
+                font-size: 20px
+                margin-bottom: 10px
+
+            .artistContainer
+                background-color: var(--black-lv3)
+                border-radius: 15px
+                color: var(--white-lv1)
+                padding-bottom: 20px
+
+                .artistAvatar
+                    width: 100%
+                    height: 200px
+                    object-fit: cover
+                    border-top-left-radius: 15px
+                    border-top-right-radius: 15px
+
+                .artistName, .artistActions
+                    margin: 20px
+
+                .artistActions
+                    display: flex
+                    align-items: center
+                    justify-content: space-between
+
+                    .followButton
+                        padding: 10px 20px
+                        border: 2px solid var(--white-lv1)
+                        border-radius: 20px
+
+        .nextSongContainer
+            left: 20px
+            border-radius: 20px
+            color: var(--white-lv1)
+            font-weight: 700
+            background-color: var(--black-lv3)
+            width: 90%
+            padding: 20px
+            margin: 200px auto 20px
+
+
+            .nextSongHeader
+                display: flex
+                align-items: center
+                justify-content: space-between
+
+                .openQueueButton
+                    color: var(--white-lv2)
+
+            .nextSongContent
+                margin-top: 20px
+                display: flex
+                align-items: center
+
+                .nextSongDetails
+                    margin-left: 20px
+
+                .nextSongCover
+                    height: 50px
+                    width: 50px
+                    border-radius: 10px
+
+                .nextSongArtist
+                    margin-top: 10px
+                    font-weight: 300
+
+    .noSongPlaying
+        padding: 20px
+        text-align: center
+        color: var(--white-lv1)
+        font-weight: 500

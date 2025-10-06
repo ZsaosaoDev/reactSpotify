@@ -1,0 +1,93 @@
+.artistContainer
+    .artistHeader
+        background: var(--black-lv3)
+        padding: 15px
+        border-radius: 10px
+        display: flex
+
+        .artistPicture
+            img
+                height: 150px
+                width: 150px
+                border-radius: 5px
+
+        .artistInfo
+            display: flex
+            flex-direction: column
+            justify-content: space-between
+            margin-left: 30px
+
+            .artistTitle
+                font-weight: 700
+                font-size: 64px
+
+            .artistDetails
+                display: flex
+                align-items: center
+                gap: 5px
+
+                .artistUserAvatar
+                    width: 20px
+                    height: 20px
+                    border-radius: 50%
+
+                .artistUserName, .artistSongCount, .artistTotalTime
+                    color: var(--white-lv1)
+
+    .artistBody
+        margin-top: 30px
+
+        .artistSongList
+            .artistSongItem
+                display: flex
+                justify-content: space-between
+
+                .artistSongRow
+                    display: flex
+                    align-items: center
+                    gap: 25px
+
+                    .artistSongIndex
+                        line-height: 70px
+                        color: var(--white-lv2)
+
+                        .artistPlayButton
+                            font-size: 14px
+                            height: 20px
+                            width: 20px
+                            display: flex
+                            align-items: center
+                            justify-content: center
+                            color: var(--while-lv1)
+                            border-radius: 50%
+                            border: none
+                            cursor: pointer
+
+                            .artistEqualizerGif
+                                width: 16px
+                                height: 16px
+
+                    .artistSongImage img
+                        height: 50px
+                        width: 40px
+                        object-fit: cover
+                        border-radius: 5px
+
+                    .artistSongInfo
+                        display: flex
+                        flex-direction: column
+                        justify-content: center
+
+                        .artistSongArtist
+                            font-size: 12px
+                            color: var(--white-lv2)
+
+                .artistSongDuration
+                    line-height: 70px
+                
+                &.active
+                    .artistSongRow
+                        .artistPlayButton
+                            color: var(--green-lv1)
+                        .artistSongTitle
+                            color: var(--green-lv1)
