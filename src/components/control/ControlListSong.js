@@ -1,13 +1,16 @@
-import { IconPlusCircle, IconClockCircle, IconMoreCircle, IconList, IconPause, IconPlay } from "~/assets/image/icons";
-import { useSelector, useDispatch } from 'react-redux';
-import { setReduxIsRight, setReduxIsPlaying } from "~/redux/reducer/songNotWhitelistSlice"
-import "./ControlListSong.sass"
+import { IconClockCircle, IconList, IconMoreCircle, IconPause, IconPlay, IconPlusCircle } from '~/assets/image/icons';
+import { useDispatch, useSelector } from 'react-redux';
+import { setReduxIsPlaying, setReduxIsRight } from '~/redux/reducer/songNotWhitelistSlice';
+import './ControlListSong.sass';
+
 const ControlListSong = ({ onPlayListSong, listSong }) => {
-
-
     const dispatch = useDispatch();
-    const isPlaying = useSelector(state => state.songNotWhite.reduxIsPlaying);
-    const reduxCurrentSongIndex = useSelector(state => state.song.reduxCurrentSongIndex);
+    const reduxCurrentSongIndex = useSelector((state) => state.song.reduxCurrentSongIndex);
+    const reduxListSong = useSelector((state) => state.song.reduxListSong);
+
+    const anySongMatchedCurrenSongIndex = () => listSong.some((song) => song.id === reduxListSong[reduxCurrentSongIndex]?.song.id);
+
+    const isPlaying = useSelector((state) => state.songNotWhite.reduxIsPlaying);
 
     const handleTogglePlay = (e) => {
         if (listSong && listSong.length > 0) {
@@ -24,14 +27,14 @@ const ControlListSong = ({ onPlayListSong, listSong }) => {
                 dispatch(setReduxIsRight(true));
             }
         }
-    }
+    };
 
     return (
         <div className="controlListSong">
             <div className="controls">
                 <div className="left">
                     <button className="playButton" onClick={(e) => handleTogglePlay(e)}>
-                        {isPlaying ? <IconPause /> : <IconPlay />}
+                        {anySongMatchedCurrenSongIndex() ? <IconPause /> : <IconPlay />}
                     </button>
                     <button className="plusCircle">
                         <IconPlusCircle />
@@ -44,9 +47,7 @@ const ControlListSong = ({ onPlayListSong, listSong }) => {
                     </button>
                 </div>
                 <div className="right">
-                    <span>
-                        List
-                    </span>
+                    <span>List</span>
                     <button className="list">
                         <IconList />
                     </button>

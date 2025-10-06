@@ -9,19 +9,11 @@ import './RightHomePage.sass';
 
 const RightHomePage = () => {
     const dispatch = useDispatch();
-    const reduxIsRight = useSelector(
-        (state) => state.songNotWhite.reduxIsRight
-    );
+    const reduxIsRight = useSelector((state) => state.songNotWhite.reduxIsRight);
     const reduxListSong = useSelector((state) => state.song.reduxListSong);
-    const reduxCurrentSongIndex = useSelector(
-        (state) => state.song.reduxCurrentSongIndex
-    );
-    const reduxIsPlaying = useSelector(
-        (state) => state.songNotWhite.reduxIsPlaying
-    );
-    const reduxCurrentTime = useSelector(
-        (state) => state.songNotWhite.reduxCurrentTime
-    );
+    const reduxCurrentSongIndex = useSelector((state) => state.song.reduxCurrentSongIndex);
+    const reduxIsPlaying = useSelector((state) => state.songNotWhite.reduxIsPlaying);
+    const reduxCurrentTime = useSelector((state) => state.songNotWhite.reduxCurrentTime);
 
     const [currentSong, setCurrentSong] = useState(null);
     const [nextSong, setNextSong] = useState(null);
@@ -31,21 +23,14 @@ const RightHomePage = () => {
 
     // Update current song
     useEffect(() => {
-        if (
-            reduxListSong.length > 0 &&
-            reduxCurrentSongIndex >= 0 &&
-            reduxCurrentSongIndex < reduxListSong.length
-        ) {
+        if (reduxListSong.length > 0 && reduxCurrentSongIndex >= 0 && reduxCurrentSongIndex < reduxListSong.length) {
             setCurrentSong(reduxListSong[reduxCurrentSongIndex]);
         } else setCurrentSong(null);
     }, [reduxListSong, reduxCurrentSongIndex]);
 
     // Update next song
     useEffect(() => {
-        if (
-            reduxListSong.length > 0 &&
-            reduxCurrentSongIndex + 1 < reduxListSong.length
-        ) {
+        if (reduxListSong.length > 0 && reduxCurrentSongIndex + 1 < reduxListSong.length) {
             setNextSong(reduxListSong[reduxCurrentSongIndex + 1]);
         } else setNextSong(null);
     }, [reduxListSong, reduxCurrentSongIndex]);
@@ -53,13 +38,8 @@ const RightHomePage = () => {
     // Sync currentTime
     useEffect(() => {
         if (mediaRef.current?.src && !isNaN(reduxCurrentTime)) {
-            const diff = Math.abs(
-                mediaRef.current.currentTime - reduxCurrentTime
-            );
-            if (
-                diff > 1 &&
-                Math.abs(lastSyncTimeRef.current - reduxCurrentTime) > 1
-            ) {
+            const diff = Math.abs(mediaRef.current.currentTime - reduxCurrentTime);
+            if (diff > 1 && Math.abs(lastSyncTimeRef.current - reduxCurrentTime) > 1) {
                 mediaRef.current.currentTime = reduxCurrentTime;
                 lastSyncTimeRef.current = reduxCurrentTime;
             }
@@ -78,11 +58,7 @@ const RightHomePage = () => {
     useEffect(() => {
         if (mediaRef.current?.src) {
             if (reduxIsPlaying) {
-                mediaRef.current
-                    .play()
-                    .catch((err) =>
-                        console.error('Right panel play error:', err)
-                    );
+                mediaRef.current.play().catch((err) => console.error('Right panel play error:', err));
             } else mediaRef.current.pause();
         }
     }, [reduxIsPlaying, currentSong?.song?.mediaUrl]);
@@ -97,66 +73,28 @@ const RightHomePage = () => {
                 <div className="currentSongContainer">
                     <div className="mediaContainer">
                         <div className="headerSong">
-                            <button
-                                onClick={handleCloseRightPanel}
-                                className="closeButton"
-                            >
+                            <button onClick={handleCloseRightPanel} className="closeButton">
                                 <IconRightArrowBox />
                             </button>
-                            <div className="imageTitle">
-                                {currentSong.artist?.name ||
-                                    currentSong.song?.artist ||
-                                    'Chưa thuộc album'}
-                            </div>
+                            <div className="imageTitle">{currentSong.artist?.name || currentSong.song?.artist || 'Chưa thuộc album'}</div>
                         </div>
-                        {currentSong.song?.mediaUrl &&
-                        isVideo(currentSong.song.mediaUrl) ? (
-                            <video
-                                ref={mediaRef}
-                                src={currentSong.song.mediaUrl}
-                                controls={false}
-                                muted
-                                playsInline
-                            />
+                        {currentSong.song?.mediaUrl && isVideo(currentSong.song.mediaUrl) ? (
+                            <video ref={mediaRef} src={currentSong.song.mediaUrl} controls={false} muted playsInline />
                         ) : (
                             <>
-                                <img
-                                    src={currentSong.song.imageUrl || NoAvatar}
-                                    alt={currentSong.song.title}
-                                    className="songImage"
-                                />
-                                <audio
-                                    ref={mediaRef}
-                                    src={currentSong.song.mediaUrl}
-                                    controls={false}
-                                    muted
-                                    preload="metadata"
-                                />
+                                <img src={currentSong.song.imageUrl || NoAvatar} alt={currentSong.song.title} className="songImage" />
+                                <audio ref={mediaRef} src={currentSong.song.mediaUrl} controls={false} muted preload="metadata" />
                             </>
                         )}
                     </div>
 
-                    <div
-                        className={`songInfoContainer ${isVideo(currentSong?.song?.mediaUrl) ? 'video' : 'audio'}`}
-                    >
-                        <div className="songTitleContainer">
-                            {currentSong?.song?.title || 'Chưa có tiêu đề'}
-                        </div>
+                    <div className={`songInfoContainer ${isVideo(currentSong?.song?.mediaUrl) ? 'video' : 'audio'}`}>
+                        <div className="songTitleContainer">{currentSong?.song?.title || 'Chưa có tiêu đề'}</div>
                         <div className="artistContainer">
-                            <img
-                                className="artistAvatar"
-                                src={currentSong.artist?.urlAvatar || NoAvatar}
-                                alt="artist-avatar"
-                            />
-                            <div className="artistName">
-                                {currentSong?.artist?.name ||
-                                    currentSong?.song?.artist ||
-                                    'Unknown Artist'}
-                            </div>
+                            <img className="artistAvatar" src={currentSong.artist?.urlAvatar || NoAvatar} alt="artist-avatar" />
+                            <div className="artistName">{currentSong?.artist?.name || currentSong?.song?.artist || 'Unknown Artist'}</div>
                             <div className="artistActions">
-                                <div className="monthlyListeners">
-                                    2,016,341 Monthly Listeners
-                                </div>
+                                <div className="monthlyListeners">2,016,341 Monthly Listeners</div>
                                 <div className="followButton">Follow</div>
                             </div>
                         </div>
@@ -169,30 +107,15 @@ const RightHomePage = () => {
                         </div>
                         {nextSong ? (
                             <div className="nextSongContent">
-                                <img
-                                    src={nextSong?.song?.imageUrl || NoAvatar}
-                                    alt={
-                                        nextSong?.song?.title || 'Unknown Song'
-                                    }
-                                    className="nextSongCover"
-                                />
+                                <img src={nextSong?.song?.imageUrl || NoAvatar} alt={nextSong?.song?.title || 'Unknown Song'} className="nextSongCover" />
                                 <div className="nextSongDetails">
-                                    <div className="nextSongTitle">
-                                        {nextSong?.song?.title ||
-                                            'Chưa có tiêu đề'}
-                                    </div>
-                                    <div className="nextSongArtist">
-                                        {nextSong?.artist?.name ||
-                                            nextSong?.song?.artist ||
-                                            'Unknown Artist'}
-                                    </div>
+                                    <div className="nextSongTitle">{nextSong?.song?.title || 'Chưa có tiêu đề'}</div>
+                                    <div className="nextSongArtist">{nextSong?.artist?.name || nextSong?.song?.artist || 'Unknown Artist'}</div>
                                 </div>
                             </div>
                         ) : (
                             <div className="nextSongContent">
-                                <div className="noNextSong">
-                                    No upcoming songs
-                                </div>
+                                <div className="noNextSong">No upcoming songs</div>
                             </div>
                         )}
                     </div>

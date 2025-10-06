@@ -3,9 +3,10 @@ import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+
 import Slider from '~/components/slider/Slider';
 import { getAlbumWithSongs, getArtistWithSongs, getListeningHistory, getSongAndArtistBySongId, getTrendingAlbums, getTrendingArtists, getTrendingSongs } from '~/apis/songApi';
-import { setReduxIsPlaying, setReduxIsRight } from '~/redux/reducer/songNotWhitelistSlice';
+import { setReduxIsPlaying, setReduxIsRight, setReduxLibrarySong } from '~/redux/reducer/songNotWhitelistSlice';
 import { addNextSong, addSongList, clearSongs, setReduxCurrentSongIndex } from '~/redux/reducer/songSlice';
 import AlbumView from '~/components/listSong/AlbumView';
 import ArtistSongList from '~/components/listSong/ArtistSongList';
@@ -19,8 +20,6 @@ const CenterHomePage = () => {
     const reduxIsRight = useSelector((state) => state.songNotWhite.reduxIsRight);
     const isLogin = useSelector((state) => state.auth.reduxIsLogin);
     const reduxCurrentSongIndex = useSelector((state) => state.song.reduxCurrentSongIndex);
-    const reduxListSong = useSelector((state) => state.song.reduxListSong);
-    const currentSong = reduxListSong?.[reduxCurrentSongIndex];
 
     const [trendingSongs, setTrendingSongs] = useState([]);
     const [topAlbums, setTopAlbums] = useState([]);
@@ -139,7 +138,6 @@ const CenterHomePage = () => {
             dispatch(setReduxIsRight(true));
             dispatch(setReduxIsPlaying(true));
 
-            // ✅ cập nhật lại lịch sử
             await updateHistory();
         },
         [artistData, dispatch, mergeArtistToSong, updateHistory]
@@ -189,6 +187,11 @@ const CenterHomePage = () => {
         [navigate]
     );
 
+    const handleLibrarySong = (e, payload) => {
+        e.preventDefault();
+        dispatch(setReduxLibrarySong(payload));
+    };
+
     // ================== RENDER ==================
     const renderContent = () => {
         switch (pageType) {
@@ -222,7 +225,12 @@ const CenterHomePage = () => {
                             <div className="trendingTitle">Trending Songs</div>
                             <Slider>
                                 {trendingSongs?.map((song) => (
-                                    <div key={song.id} className="trendingSongItem">
+                                    <div
+                                        key={song.id}
+                                        className="trendingSongItem"
+                                        onContextMenu={(e) => {
+                                            handleLibrarySong(e, { type: 'playlist', id: song.id });
+                                        }}>
                                         <div className="trendingSongImage">
                                             <img src={song.imageUrl} alt={song.title} />
                                         </div>

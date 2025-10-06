@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     reduxListSong: [],
@@ -9,7 +9,7 @@ const initialState = {
 };
 
 const songSlice = createSlice({
-    name: "song",
+    name: 'song',
     initialState,
     reducers: {
         // Thêm 1 bài hát sau bài đang phát (Play Next)
@@ -32,24 +32,15 @@ const songSlice = createSlice({
         setReduxCurrentSongIndex: (state, action) => {
             const listLength = state.reduxListSong.length;
 
-            if (action.payload === "next") {
+            if (action.payload === 'next') {
                 // Increase index by 1, but stop at the last song (listLength - 1)
-                state.reduxCurrentSongIndex = Math.min(
-                    state.reduxCurrentSongIndex + 1,
-                    listLength - 1
-                );
-            } else if (action.payload === "prev") {
+                state.reduxCurrentSongIndex = Math.min(state.reduxCurrentSongIndex + 1, listLength - 1);
+            } else if (action.payload === 'prev') {
                 // Decrease index by 1, but stop at 0
-                state.reduxCurrentSongIndex = Math.max(
-                    state.reduxCurrentSongIndex - 1,
-                    0
-                );
-            } else if (typeof action.payload === "number") {
+                state.reduxCurrentSongIndex = Math.max(state.reduxCurrentSongIndex - 1, 0);
+            } else if (typeof action.payload === 'number') {
                 // Set index directly, but clamp it between 0 and listLength - 1
-                state.reduxCurrentSongIndex = Math.max(
-                    0,
-                    Math.min(action.payload, listLength - 1)
-                );
+                state.reduxCurrentSongIndex = Math.max(0, Math.min(action.payload, listLength - 1));
             }
         },
 
@@ -62,7 +53,6 @@ const songSlice = createSlice({
                 state.reduxListSong.splice(state.reduxListSong.length - 1, 1);
                 state.reduxCurrentSongIndex = Math.max(0, state.reduxCurrentSongIndex - 1);
             }
-
         },
         clearSongs: (state) => {
             state.reduxListSong = [];
@@ -79,12 +69,7 @@ const songSlice = createSlice({
             state.reduxVolume = action.payload;
         },
     },
-
-
-
-
 });
 
-export const { addNextSong, addSongToEnd, setReduxCurrentSongIndex, removeSong, clearSongs,
-    setReduxIsRight, setReduxCurrentTime, setReduxIsPlaying, addSongList, setReduxVolume } = songSlice.actions;
+export const { addNextSong, addSongToEnd, setReduxCurrentSongIndex, removeSong, clearSongs, setReduxIsRight, setReduxCurrentTime, setReduxIsPlaying, addSongList, setReduxVolume } = songSlice.actions;
 export default songSlice.reducer;

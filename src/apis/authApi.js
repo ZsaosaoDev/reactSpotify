@@ -1,12 +1,11 @@
-import api from "./api";
-
+import api from './api';
 
 async function registerInitiate(email, password) {
     try {
         const res = await api.post('/auth/register-initiate', { email, password }, { skipAuthCheck: true });
         return res.data;
     } catch (err) {
-        throw (err)
+        throw err;
     }
 }
 
@@ -15,7 +14,7 @@ async function registerVerify(email, verificationCode) {
         const res = await api.post('/auth/register-verify', { email, verificationCode }, { skipAuthCheck: true });
         return res.data;
     } catch (err) {
-        throw (err)
+        throw err;
     }
 }
 
@@ -24,7 +23,7 @@ async function logout() {
         const res = await api.post('/auth/logout');
         return res.data;
     } catch (err) {
-        throw (err)
+        throw err;
     }
 }
 
@@ -33,7 +32,7 @@ async function profile() {
         const res = await api.get('/user/profile');
         return res.data;
     } catch (err) {
-        throw (err)
+        throw err;
     }
 }
 
@@ -51,9 +50,8 @@ async function loginWithGoogle(code) {
         const res = await api.post('/auth/google-callback', code, { skipAuthCheck: true });
         return res.data;
     } catch (err) {
-        throw (err)
+        throw err;
     }
 }
 
-
-export { registerInitiate, registerVerify, logout, login, loginWithGoogle, profile }
+export { registerInitiate, registerVerify, logout, login, loginWithGoogle, profile };

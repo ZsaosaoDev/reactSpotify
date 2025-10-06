@@ -50,6 +50,7 @@ async function listenSong(songId) {
         throw err;
     }
 }
+
 async function calDurationSong(songId) {
     try {
         const res = await api.put(`user/songs/${songId}/cal-duration-song`);
@@ -70,6 +71,7 @@ async function getTrendingAlbums(page = 0, size = 10) {
         throw err;
     }
 }
+
 async function getAlbumWithSongs(albumId) {
     try {
         const res = await api.get(`user/albums/${albumId}/songs`);
@@ -78,6 +80,7 @@ async function getAlbumWithSongs(albumId) {
         throw err;
     }
 }
+
 async function getTrendingArtists(page = 0, size = 10, days = 7) {
     try {
         const res = await api.get(
@@ -113,6 +116,42 @@ async function getListeningHistory(page = 0, size = 10) {
     }
 }
 
+async function follow(id, type) {
+    try {
+        const res = await api.post('/user/follow', { id, type });
+        return res.data;
+    } catch (err) {
+        throw err;
+    }
+}
+
+async function unfollow(id, type) {
+    try {
+        const res = await api.post('/user/unfollow', { id, type });
+        return res.data;
+    } catch (err) {
+        throw err;
+    }
+}
+
+async function addSongToPlaylist(playlistId, songId) {
+    try {
+        const res = await api.post(`user/${playlistId}/songs/${songId}`);
+        return res.data;
+    } catch (err) {
+        throw err;
+    }
+}
+
+async function deleteSongFromPlaylist(playlistId, songId) {
+    try {
+        const res = await api.delete(`user/${playlistId}/songs/${songId}`);
+        return res.data;
+    } catch (err) {
+        throw err;
+    }
+}
+
 export {
     uploadSong,
     getAllSongGenres,
@@ -125,4 +164,8 @@ export {
     getTrendingArtists,
     getArtistWithSongs,
     getListeningHistory,
+    follow,
+    unfollow,
+    addSongToPlaylist,
+    deleteSongFromPlaylist,
 };
