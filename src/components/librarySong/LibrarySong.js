@@ -90,7 +90,7 @@ const LibrarySong = () => {
         e.stopPropagation();
         setMenuPosition(null);
     };
-
+    const [notificationKey, setNotificationKey] = useState(0);
     // Dynamic menu options based on type
     const getMenuOptions = () => {
         const { type, id } = reduxLibrarySong;
@@ -104,6 +104,7 @@ const LibrarySong = () => {
                         try {
                             const res = await addSongToPlaylist(1, id);
                             setNotificationData(res);
+                            setNotificationKey((prev) => prev + 1); // Change key to re-trigger Notification
                         } catch (err) {
                             console.error('Failed to add to playlist:', err);
                         }
@@ -142,10 +143,9 @@ const LibrarySong = () => {
 
         return options;
     };
-
     return (
         <div className="library-song-container">
-            <Notification data={notificationData} />
+            <Notification key={notificationKey} message={notificationData} />
             {menuPosition && (
                 <div
                     className="library-song-menu"

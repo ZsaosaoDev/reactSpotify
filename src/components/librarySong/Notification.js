@@ -1,20 +1,31 @@
 import './Notification.sass';
 import { useEffect, useState } from 'react';
 
-const Notification = ({ data, onClose }) => {
+const Notification = ({ key, message }) => {
+    console.log(message);
     const [visible, setVisible] = useState(false);
+    const [data, setData] = useState('');
 
     useEffect(() => {
-        if (data) {
+        if (message) {
+            setData(message);
             setVisible(true);
+
             const timer = setTimeout(() => {
-                setVisible(false);
-                if (onClose) onClose(); // thông báo cho parent nếu cần
-            }, 3000); // 3 giây
+                setVisible(false); // Only hide, don't clear data immediately
+            }, 2000);
 
             return () => clearTimeout(timer);
         }
-    }, [data, onClose]);
+    }, [message]);
+
+    // Clear data after animation ends
+    useEffect(() => {
+        if (!visible && data) {
+            const timer = setTimeout(() => setData(''), 500); // 500ms matches CSS transition
+            return () => clearTimeout(timer);
+        }
+    }, [visible, data]);
 
     return (
         <div className={`notification ${visible ? 'show' : ''}`}>
