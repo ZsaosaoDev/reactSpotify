@@ -1,8 +1,7 @@
 import './Notification.sass';
 import { useEffect, useState } from 'react';
 
-const Notification = ({ key, message }) => {
-    console.log(message);
+const Notification = ({ notificationKey, message }) => {
     const [visible, setVisible] = useState(false);
     const [data, setData] = useState('');
 

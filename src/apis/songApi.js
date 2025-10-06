@@ -152,6 +152,15 @@ async function deleteSongFromPlaylist(playlistId, songId) {
     }
 }
 
+async function getMyPlaylists() {
+    try {
+        const res = await api.get('user/my-playlists');
+        return res.data;
+    } catch (err) {
+        throw err;
+    }
+}
+
 export {
     uploadSong,
     getAllSongGenres,
@@ -168,4 +177,5 @@ export {
     unfollow,
     addSongToPlaylist,
     deleteSongFromPlaylist,
+    getMyPlaylists,
 };
