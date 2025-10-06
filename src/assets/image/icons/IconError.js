@@ -1,4 +1,4 @@
-export default function IconError({ height = 16, fill = "currentColor" }) {
+export default function IconError({ height = 16, fill = "" }) {
     return (
         <svg
             viewBox="0 0 16 16"

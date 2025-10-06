@@ -5,6 +5,7 @@ const initialState = {
     reduxCurrentSongIndex: -1,
     reduxCurrentTime: 0,
     reduxIsPlaying: false,
+    reduxVolume: 0.1,
 };
 
 const songSlice = createSlice({
@@ -73,6 +74,10 @@ const songSlice = createSlice({
             state.reduxListSong = [...state.reduxListSong, ...songs];
             state.reduxCurrentSongIndex = currentIndex;
         },
+
+        setReduxVolume: (state, action) => {
+            state.reduxVolume = action.payload;
+        },
     },
 
 
@@ -81,5 +86,5 @@ const songSlice = createSlice({
 });
 
 export const { addNextSong, addSongToEnd, setReduxCurrentSongIndex, removeSong, clearSongs,
-    setReduxIsRight, setReduxCurrentTime, setReduxIsPlaying, addSongList } = songSlice.actions;
+    setReduxIsRight, setReduxCurrentTime, setReduxIsPlaying, addSongList, setReduxVolume } = songSlice.actions;
 export default songSlice.reducer;

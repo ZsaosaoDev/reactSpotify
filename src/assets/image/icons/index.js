@@ -11,7 +11,6 @@ export { default as IconNotificationEmpty } from "./IconNotificationEmpty";
 export { default as IconNotificationFull } from "./IconNotificationFull";
 export { default as IconFriends } from "./IconFriends";
 export { default as IconGoogle } from "./IconGoogle";
-export { default as IconApple } from "./IconApple";
 export { default as IconError } from "./IconError";
 export { default as IconShrink } from "./IconShrink"
 export { default as IconWiden } from "./IconWiden"
@@ -20,3 +19,8 @@ export { default as IconLeftSong } from "./IconLeftSong"
 export { default as IconRightSong } from "./IconRightSong"
 export { default as IconPlay } from "./IconPlay"
 export { default as IconPause } from "./IconPause"
+export { default as IconClockCircle } from "./IconClockCircle"
+export { default as IconPlusCircle } from "./IconPlusCircle"
+export { default as IconMoreCircle } from "./IconMoreCircle"
+export { default as IconRightArrowBox } from "./IconRightArrowBox"
+

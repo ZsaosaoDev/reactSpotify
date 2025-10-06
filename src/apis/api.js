@@ -33,39 +33,23 @@ const setAuthHeader = (token) => {
 
 // --- Hàm khởi tạo khi app bật lại ---
 const initializeAuthHeader = async () => {
-    const token = store.getState().auth.reduxAccessToken;
-    if (!token) return;
-
+    // Token hết hạn -> gọi refresh ngay khi app mở
     try {
-        const { exp } = jwtDecode(token);
-        const isExpired = Date.now() >= exp * 1000;
-
-        if (!isExpired) {
-            // Token còn hạn -> dùng luôn
-            setAuthHeader(token);
-        } else {
-            // Token hết hạn -> gọi refresh ngay khi app mở
-            try {
-                const res = await axios.get(`${BASE_URL}/auth/access-token`, { withCredentials: true });
-                const newToken = res.data.accessToken;
-
-                store.dispatch(setReduxAccessToken(newToken));
-                setAuthHeader(newToken);
-            } catch (err) {
-                console.warn('❌ Failed to refresh access token on init:', err);
-                store.dispatch(setReduxAccessToken(null));
-                setAuthHeader(null);
-            }
-        }
-    } catch (error) {
-        console.warn('⚠️ Invalid token in store:', error);
+        const res = await axios.get(`${BASE_URL}/auth/access-token`, { withCredentials: true });
+        const newToken = res.data.accessToken;
+        store.dispatch(setReduxAccessToken(newToken));
+        setAuthHeader(newToken);
+    } catch (err) {
+        console.warn('❌ Failed to refresh access token on init:', err);
         store.dispatch(setReduxAccessToken(null));
         setAuthHeader(null);
     }
+
 };
 
 // --- Gọi hàm khởi tạo ngay khi import ---
 initializeAuthHeader();
+
 
 // --- Interceptor: kiểm tra & refresh token khi request ---
 api.interceptors.request.use(async (config) => {

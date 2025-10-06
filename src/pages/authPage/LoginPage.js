@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 
 import { login, profile } from "~/apis/authApi"
 import GoogleLoginButton from "~/components/buttons/GoogleLoginButton";
-import { isValidEmail } from "~/util/valid";
+import { isValidEmail } from "~/util/validUtils";
 import { LogoMain } from "~/assets/image/icons";
 import { setReduxLogin, setReduxUser } from "~/redux/reducer/authSlice";
 import './LoginPage.sass';

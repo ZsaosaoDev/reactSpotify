@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from 'react-redux';
 
 import { registerInitiate } from "~/apis/authApi"
-import { isValidEmail } from "~/util/valid";
+import { isValidEmail } from "~/util/validUtils";
 import { LogoMain, IconGoogle } from "~/assets/image/icons";
 import { setReduxEmail } from "~/redux/reducer/authSlice";
 import './SignUpInitiatePage.sass';

@@ -1,5 +1,8 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
+    <CssCodeStyleSettings>
+      <option name="ENFORCE_QUOTES_ON_FORMAT" value="true" />
+    </CssCodeStyleSettings>
     <HTMLCodeStyleSettings>
       <option name="HTML_SPACE_INSIDE_EMPTY_TAG" value="true" />
     </HTMLCodeStyleSettings>
@@ -12,6 +15,9 @@
       <option name="SPACES_WITHIN_OBJECT_LITERAL_BRACES" value="true" />
       <option name="SPACES_WITHIN_IMPORTS" value="true" />
     </JSCodeStyleSettings>
+    <ScssCodeStyleSettings>
+      <option name="ENFORCE_QUOTES_ON_FORMAT" value="true" />
+    </ScssCodeStyleSettings>
     <TypeScriptCodeStyleSettings version="0">
       <option name="FORCE_SEMICOLON_STYLE" value="true" />
       <option name="SPACE_BEFORE_FUNCTION_LEFT_PARENTH" value="false" />
@@ -25,6 +31,9 @@
       <option name="INTERPOLATION_NEW_LINE_AFTER_START_DELIMITER" value="false" />
       <option name="INTERPOLATION_NEW_LINE_BEFORE_END_DELIMITER" value="false" />
     </VueCodeStyleSettings>
+    <editorconfig>
+      <option name="ENABLED" value="false" />
+    </editorconfig>
     <codeStyleSettings language="HTML">
       <option name="SOFT_MARGINS" value="80" />
       <indentOptions>
@@ -33,6 +42,11 @@
     </codeStyleSettings>
     <codeStyleSettings language="JavaScript">
       <option name="SOFT_MARGINS" value="80" />
+    </codeStyleSettings>
+    <codeStyleSettings language="SASS">
+      <indentOptions>
+        <option name="INDENT_SIZE" value="4" />
+      </indentOptions>
     </codeStyleSettings>
     <codeStyleSettings language="TypeScript">
       <option name="SOFT_MARGINS" value="80" />

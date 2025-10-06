@@ -10,6 +10,8 @@ import UploadSongPage from "~/pages/songPage/UploadSongPage";
 const pages = {
     "/": HomePage,
     "/album/*": HomePage,
+    "/artist/*": HomePage,
+    "/playlist/*": HomePage,
     "/signUpInitiatePage": SignUpInitiatePage,
     "/signUpVerifyPage": SignUpVerifyPage,
     "/loginPage": LoginPage,
@@ -20,7 +22,7 @@ const pages = {
 // Hàm helper để lấy animation key
 const getAnimationKey = (pathname) => {
     // Nếu pathname là "/" hoặc bắt đầu với "/album", trả về cùng 1 key
-    if (pathname === "/" || pathname.startsWith("/album")) {
+    if (pathname === "/" || pathname.startsWith("/album") || pathname.startsWith("/artist") || pathname.startsWith("/playlist")) {
         return "home";
     }
     // Còn lại trả về pathname để có animation riêng

@@ -1,7 +1,4 @@
-export default function IconList({
-    height = 24,
-    fill = "var(--black-lv4)"
-}) {
+export default function IconList({ height = 16, fill = "var(--black-lv4)" }) {
     return (
         <svg
             viewBox="0 0 16 16"
