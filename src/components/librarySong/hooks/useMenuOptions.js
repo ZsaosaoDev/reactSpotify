@@ -58,9 +58,13 @@ export const useMenuOptions = (reduxData, onNotification) => {
                         action: async () => {
                             for (const item of reduxLibrarySong) {
                                 if (item.type === 'artist') {
-                                    const res = await follow(item.id, 'ARTIST');
-                                    dispatch(setReduxRefresh());
-                                    onNotification(res);
+                                    try {
+                                        const res = await follow(item.id, 'ARTIST');
+                                        dispatch(setReduxRefresh());
+                                        onNotification(res);
+                                    } catch (e) {
+                                        onNotification('Vui lòng đăng nhập để follow nghệ sĩ');
+                                    }
                                 }
                             }
                         },

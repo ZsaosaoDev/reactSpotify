@@ -36,7 +36,7 @@ async function getTrendingSongs(page = 0, size = 10, days = 7) {
 
 async function getSongAndArtistBySongId(songId) {
     try {
-        const res = await api.get(`user/songs/${songId}`);
+        const res = await api.get(`open/songs/${songId}`);
         return res.data;
     } catch (err) {
         throw err;
@@ -74,7 +74,7 @@ async function getTrendingAlbums(page = 0, size = 10) {
 
 async function getAlbumWithSongs(albumId) {
     try {
-        const res = await api.get(`user/albums/${albumId}/songs`);
+        const res = await api.get(`open/albums/${albumId}/songs`);
         return res.data;
     } catch (err) {
         throw err;

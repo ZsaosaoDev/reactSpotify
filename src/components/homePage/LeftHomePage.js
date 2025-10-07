@@ -21,7 +21,6 @@ const LeftHomePage = () => {
     const fetchFollowed = useCallback(async () => {
         try {
             const res = await followed();
-            console.log('Followed:', res);
             setFollowedData(res);
         } catch (error) {
             console.error('Error fetching followed:', error);
