@@ -1,16 +1,16 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlay } from '@fortawesome/free-solid-svg-icons';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { formatDuration, calculateTotalTime } from "~/util/timeUtils";
-import "./ArtistSongList.sass";
+import { formatDuration, calculateTotalTime } from '~/util/timeUtils';
+import './ArtistSongList.sass';
 
 const ArtistSongList = ({ albumData, onPlayListSong }) => {
     const [hoverIndex, setHoverIndex] = useState(null);
 
-    const currentIndex = useSelector(state => state.song.reduxCurrentSongIndex);
-    const isPlaying = useSelector(state => state.songNotWhite.reduxIsPlaying);
+    const currentIndex = useSelector((state) => state.song.reduxCurrentSongIndex);
+    const isPlaying = useSelector((state) => state.songNotWhite.reduxIsPlaying);
 
     return (
         <div className="artistContainer">
@@ -21,20 +21,10 @@ const ArtistSongList = ({ albumData, onPlayListSong }) => {
                 <div className="artistInfo">
                     <div className="artistTitle">{albumData.album.name}</div>
                     <div className="artistDetails">
-                        <img
-                            className="artistUserAvatar"
-                            src={albumData.artist.urlAvatar}
-                            alt={albumData.artist?.username || "Artist"}
-                        />
-                        <div className="artistUserName">
-                            {albumData.artist?.username || "No name"}
-                        </div>
-                        <div className="artistSongCount">
-                            {albumData.songs.length} song(s)
-                        </div>
-                        <div className="artistTotalTime">
-                            {calculateTotalTime()}
-                        </div>
+                        <img className="artistUserAvatar" src={albumData.artist.urlAvatar} alt={albumData.artist?.username || 'Artist'} />
+                        <div className="artistUserName">{albumData.artist?.username || 'No name'}</div>
+                        <div className="artistSongCount">{albumData.songs.length} song(s)</div>
+                        <div className="artistTotalTime">{calculateTotalTime(albumData.album.song)}</div>
                     </div>
                 </div>
             </div>
@@ -47,21 +37,12 @@ const ArtistSongList = ({ albumData, onPlayListSong }) => {
                             key={song.id || index}
                             className={`artistSongItem ${index === currentIndex ? 'active' : ''}`}
                             onMouseEnter={() => setHoverIndex(index)}
-                            onMouseLeave={() => setHoverIndex(null)}
-                        >
+                            onMouseLeave={() => setHoverIndex(null)}>
                             <div className="artistSongRow">
                                 <div className="artistSongIndex">
-                                    <button
-                                        className="artistPlayButton"
-                                        onClick={(e) => onPlayListSong(e, song.id)}
-                                    >
-
+                                    <button className="artistPlayButton" onClick={(e) => onPlayListSong(e, song.id)}>
                                         {index === currentIndex && isPlaying ? (
-                                            <img
-                                                src="https://open.spotifycdn.com/cdn/images/equaliser-animated-green.f5eb96f2.gif"
-                                                alt="Playing"
-                                                className="artistEqualizerGif"
-                                            />
+                                            <img src="https://open.spotifycdn.com/cdn/images/equaliser-animated-green.f5eb96f2.gif" alt="Playing" className="artistEqualizerGif" />
                                         ) : hoverIndex === index ? (
                                             <FontAwesomeIcon icon={faPlay} />
                                         ) : (
@@ -74,16 +55,10 @@ const ArtistSongList = ({ albumData, onPlayListSong }) => {
                                 </div>
                                 <div className="artistSongInfo">
                                     <div className="artistSongTitle">{song.title}</div>
-                                    <div className="artistSongArtist">
-                                        {song.artistName ||
-                                            albumData.artist?.username ||
-                                            "Unknown Artist"}
-                                    </div>
+                                    <div className="artistSongArtist">{song.artistName || albumData.artist?.username || 'Unknown Artist'}</div>
                                 </div>
                             </div>
-                            <div className="artistSongDuration">
-                                {formatDuration(song.duration)}
-                            </div>
+                            <div className="artistSongDuration">{formatDuration(song.duration)}</div>
                         </div>
                     ))}
                 </div>

@@ -27,7 +27,7 @@ const AlbumView = ({ albumData, onPlayListSong }) => {
                         <img className="albumUserAvatar" src={albumData.artist.urlAvatar} alt={albumData.artist?.username || 'Artist'} />
                         <div className="albumUserName">{albumData.artist?.username || 'No name'}</div>
                         <div className="albumSongCount">{albumData.songs.length} song(s)</div>
-                        <div className="albumTotalTime">{calculateTotalTime()}</div>
+                        <div className="albumTotalTime">{calculateTotalTime(albumData.songs)}</div>
                     </div>
                 </div>
             </div>
