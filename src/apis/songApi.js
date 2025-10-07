@@ -161,6 +161,15 @@ async function getMyPlaylists() {
     }
 }
 
+async function createPlaylistWithSong(songId) {
+    try {
+        const res = await api.post('user/create-playlist-with-song', { songId });
+        return res.data;
+    } catch (err) {
+        throw err;
+    }
+}
+
 export {
     uploadSong,
     getAllSongGenres,
@@ -178,4 +187,5 @@ export {
     addSongToPlaylist,
     deleteSongFromPlaylist,
     getMyPlaylists,
+    createPlaylistWithSong,
 };

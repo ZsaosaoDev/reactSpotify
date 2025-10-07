@@ -16,7 +16,6 @@ const ContextMenu = ({ position, reduxData, playlists, onClose, onNotification }
         const adjustedX = Math.min(panelX, windowWidth - panelWidth);
         const adjustedY = Math.min(panelY, windowHeight - 100);
 
-        console.log('Setting playlistPanel:', { x: adjustedX, y: adjustedY });
         setPlaylistPanelPosition({ x: adjustedX, y: adjustedY });
     };
 

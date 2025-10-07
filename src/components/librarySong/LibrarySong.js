@@ -31,7 +31,6 @@ const LibrarySong = () => {
 
     // Close menu and clean redux
     const handleCloseMenu = () => {
-        console.log('Closing menu and dispatching cleanReduxLibrarySong');
         setMenuPosition(null);
         dispatch(cleanReduxLibrarySong());
     };
@@ -71,7 +70,6 @@ const LibrarySong = () => {
             const isMenuClick = e.target.closest('.library-song-menu');
             const isPlaylistClick = e.target.closest('.playlist-selection-panel');
             if (!isMenuClick && !isPlaylistClick) {
-                console.log('Document clicked, closing menu');
                 handleCloseMenu();
             }
         };
@@ -83,6 +81,7 @@ const LibrarySong = () => {
             document.removeEventListener('contextmenu', handleContextMenu);
             document.removeEventListener('click', handleClick);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [menuPosition, reduxLibrarySong]);
 
     // Keyboard accessibility

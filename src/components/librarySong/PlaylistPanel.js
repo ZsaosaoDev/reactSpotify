@@ -1,4 +1,4 @@
-import { addSongToPlaylist } from '~/apis/songApi';
+import { addSongToPlaylist, createPlaylistWithSong } from '~/apis/songApi';
 import { IconPlus, IconSearch } from '~/assets/image/icons';
 import './PlaylistPanel.sass';
 
@@ -10,13 +10,28 @@ const PlaylistPanel = ({ position, playlists, songId, onClose, onNotification, o
 
         try {
             const res = await addSongToPlaylist(playlistId, songId);
-            console.log('API response:', res);
             onNotification(res.message || res);
         } catch (err) {
             console.error('Failed to add to playlist:', err);
             onNotification('Failed to add song to playlist');
         }
 
+        onClose();
+    };
+
+    const handleCreateNewPlaylist = async (e) => {
+        e.stopPropagation();
+        console.log('Creating new playlist...');
+
+        try {
+            const res = await createPlaylistWithSong(songId);
+            console.log(res);
+            onNotification(res.message || 'Created playlist' + res.name);
+        } catch (err) {
+            onNotification('Failed to create playlist');
+        }
+
+        // Đóng panel sau khi tạo xong
         onClose();
     };
 
@@ -38,7 +53,7 @@ const PlaylistPanel = ({ position, playlists, songId, onClose, onNotification, o
                     <IconSearch height={14} className="icon" />
                     <input type="text" placeholder="Find a playlist" />
                 </div>
-                <div className="new-playlist">
+                <div className="new-playlist" onClick={handleCreateNewPlaylist}>
                     <IconPlus height={14} className="icon" />
                     <span>New Playlist</span>
                 </div>
