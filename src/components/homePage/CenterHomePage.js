@@ -205,7 +205,20 @@ const CenterHomePage = () => {
                                 <div className="listeningHistoryTitle">Listening History</div>
                                 <div className="listeningHistoryList">
                                     {listeningHistory.map((item) => (
-                                        <div key={item.id} className={`historyItem ${reduxIsRight ? 'rightActive' : ''}`} onClick={(e) => listenSong(e, item.id)}>
+                                        <div
+                                            key={item.id}
+                                            className={`historyItem ${reduxIsRight ? 'rightActive' : ''}`}
+                                            onClick={(e) => listenSong(e, item.id)}
+                                            onContextMenu={(e) => {
+                                                handleLibrarySong(e, [
+                                                    { type: 'playlist', id: item.id },
+                                                    {
+                                                        type: 'artist',
+                                                        id: item.artistId,
+                                                    },
+                                                ]);
+                                            }}>
+                                            >
                                             <div className="historyImage">
                                                 <img src={item.imageUrl} alt={item.title} />
                                             </div>
