@@ -14,20 +14,21 @@ const LibrarySong = () => {
 
     const reduxLibrarySong = useSelector((state) => state.songNotWhite.reduxLibrarySong);
     const dispatch = useDispatch();
+    const reduxIsLogin = useSelector((state) => state.auth.reduxIsLogin);
 
     // Fetch playlists on mount
     useEffect(() => {
+        if (!reduxIsLogin) return;
         const loadPlaylists = async () => {
             try {
                 const playlistData = await getMyPlaylists();
-                console.log('Fetched playlists:', playlistData);
                 setPlaylists(playlistData);
             } catch (err) {
                 console.error('Failed to fetch playlists:', err);
             }
         };
         loadPlaylists();
-    }, []);
+    }, [reduxIsLogin]);
 
     // Handle body overflow when menu is open
     useEffect(() => {

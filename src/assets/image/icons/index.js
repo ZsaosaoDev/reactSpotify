@@ -25,3 +25,4 @@ export { default as IconMoreCircle } from './IconMoreCircle';
 export { default as IconRightArrowBox } from './IconRightArrowBox';
 export { default as IconPlus } from './IconPlus';
 export { default as IconTriangle } from './IconTriangle';
+export { default as IconFollow } from './IconFollow';

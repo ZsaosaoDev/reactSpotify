@@ -229,7 +229,13 @@ const CenterHomePage = () => {
                                         key={song.id}
                                         className="trendingSongItem"
                                         onContextMenu={(e) => {
-                                            handleLibrarySong(e, { type: 'playlist', id: song.id });
+                                            handleLibrarySong(e, [
+                                                { type: 'playlist', id: song.id },
+                                                {
+                                                    type: 'artist',
+                                                    id: song.artistId,
+                                                },
+                                            ]);
                                         }}>
                                         <div className="trendingSongImage">
                                             <img src={song.imageUrl} alt={song.title} />

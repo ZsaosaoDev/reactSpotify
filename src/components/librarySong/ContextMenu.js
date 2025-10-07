@@ -20,7 +20,7 @@ const ContextMenu = ({ position, reduxData, playlists, onClose, onNotification }
     };
 
     // Get menu options based on reduxData type
-    const baseMenuOptions = useMenuOptions(reduxData);
+    const baseMenuOptions = useMenuOptions(reduxData, onNotification);
 
     // Inject showPlaylistPanel action for playlist options
     const menuOptions = baseMenuOptions.map((option) => ({

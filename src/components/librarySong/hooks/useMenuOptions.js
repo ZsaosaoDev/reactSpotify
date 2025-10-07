@@ -1,7 +1,11 @@
 import { useMemo } from 'react';
-import { IconPlusCircle, IconTriangle } from '~/assets/image/icons';
 
-export const useMenuOptions = (reduxData) => {
+import { follow } from '~/apis/songApi';
+import { IconFollow, IconPlusCircle, IconTriangle } from '~/assets/image/icons';
+import { useSelector } from 'react-redux';
+
+export const useMenuOptions = (reduxData, onNotification) => {
+    const reduxLibrarySong = useSelector((state) => state.songNotWhite.reduxLibrarySong);
     return useMemo(() => {
         if (!Array.isArray(reduxData) || reduxData.length === 0) {
             return [];
@@ -23,7 +27,7 @@ export const useMenuOptions = (reduxData) => {
                                 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <IconPlusCircle height={16} />
-                                    Add to Playlist
+                                    Add To Playlist
                                 </div>
                                 <IconTriangle height={16} />
                             </div>
@@ -31,24 +35,35 @@ export const useMenuOptions = (reduxData) => {
                         action: null,
                         isPlaylistAction: true,
                     });
-                    options.push({
-                        label: 'Follow Artist',
-                        action: () => console.log('Follow artist action for ID:', id),
-                        isPlaylistAction: false,
-                    });
                     break;
 
                 case 'artist':
                     options.push({
-                        label: 'Follow Artist',
-                        action: () => console.log('Follow artist action for ID:', id),
+                        label: (
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    width: '100%',
+                                }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <IconFollow height={16} />
+                                    Follow Artist
+                                </div>
+                            </div>
+                        ),
+                        action: async () => {
+                            for (const item of reduxLibrarySong) {
+                                if (item.type === 'artist') {
+                                    const res = await follow(item.id, 'ARTIST');
+                                    onNotification(res);
+                                }
+                            }
+                        },
                         isPlaylistAction: false,
                     });
-                    options.push({
-                        label: 'View Artist Profile',
-                        action: () => console.log('View artist profile action for ID:', id),
-                        isPlaylistAction: false,
-                    });
+
                     break;
 
                 case 'album':
@@ -70,6 +85,7 @@ export const useMenuOptions = (reduxData) => {
         });
 
         return options;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [reduxData]);
 };
 

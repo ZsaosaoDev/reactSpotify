@@ -1,9 +1,10 @@
-import { addSongToPlaylist, createPlaylistWithSong } from '~/apis/songApi';
-import { IconPlus, IconSearch } from '~/assets/image/icons';
 import { useEffect, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
+
+import { IconPlus, IconSearch } from '~/assets/image/icons';
+import { addSongToPlaylist, createPlaylistWithSong } from '~/apis/songApi';
 import { normalizeString } from '~/util/stringUtil';
 import './PlaylistPanel.sass';
-import { useSelector } from 'react-redux';
 
 const PlaylistPanel = ({ position, playlists, onClose, onNotification, onMouseEnter, onMouseLeave }) => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -25,11 +26,11 @@ const PlaylistPanel = ({ position, playlists, onClose, onNotification, onMouseEn
         }
 
         try {
-            // Loop through all songs and add to playlist
             for (const item of reduxLibrarySong) {
-                const songId = item.id;
-                const res = await addSongToPlaylist(playlistId, songId);
-                onNotification(res);
+                if (item.type === 'playlist') {
+                    const res = await addSongToPlaylist(playlistId, item.id);
+                    onNotification(res);
+                }
             }
         } catch (err) {
             console.error('Failed to add to playlist:', err);
@@ -48,10 +49,12 @@ const PlaylistPanel = ({ position, playlists, onClose, onNotification, onMouseEn
         }
 
         try {
-            // Create playlist with first song, then add remaining songs
-            const firstSongId = reduxLibrarySong[0].id;
-            const res = await createPlaylistWithSong(firstSongId);
-            onNotification(res);
+            for (const item of reduxLibrarySong) {
+                if (item.type === 'playlist') {
+                    const res = await createPlaylistWithSong(item.id);
+                    onNotification(res);
+                }
+            }
         } catch (err) {
             console.error('Failed to create playlist:', err);
             onNotification('Failed to create playlist');

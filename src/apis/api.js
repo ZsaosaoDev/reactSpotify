@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { store } from '../redux/store';
-import { setReduxAccessToken } from "../redux/reducer/authSlice";
+import { setReduxAccessToken } from '../redux/reducer/authSlice';
 
 const BASE_URL = 'http://localhost:8080/api';
 
@@ -16,9 +16,7 @@ let isRefreshing = false;
 let failedQueue = [];
 
 const processQueue = (error, token = null) => {
-    failedQueue.forEach(prom =>
-        error ? prom.reject(error) : prom.resolve(token)
-    );
+    failedQueue.forEach((prom) => (error ? prom.reject(error) : prom.resolve(token)));
     failedQueue = [];
 };
 
@@ -30,104 +28,106 @@ const setAuthHeader = (token) => {
         delete api.defaults.headers.common['Authorization'];
     }
 };
-
+const { reduxIsLogin } = store.getState().auth;
 // --- Hàm khởi tạo khi app bật lại ---
 const initializeAuthHeader = async () => {
-    // Token hết hạn -> gọi refresh ngay khi app mở
+    if (!reduxIsLogin) return;
+
     try {
         const res = await axios.get(`${BASE_URL}/auth/access-token`, { withCredentials: true });
         const newToken = res.data.accessToken;
         store.dispatch(setReduxAccessToken(newToken));
         setAuthHeader(newToken);
     } catch (err) {
-        console.warn('❌ Failed to refresh access token on init:', err);
+        console.warn('Failed to refresh access token on init:', err);
         store.dispatch(setReduxAccessToken(null));
         setAuthHeader(null);
     }
-
 };
 
 // --- Gọi hàm khởi tạo ngay khi import ---
 initializeAuthHeader();
 
-
 // --- Interceptor: kiểm tra & refresh token khi request ---
-api.interceptors.request.use(async (config) => {
-    if (config.skipAuthCheck) return config;
+api.interceptors.request.use(
+    async (config) => {
+        if (config.skipAuthCheck) return config;
 
-    const token = store.getState().auth.reduxAccessToken;
+        const token = store.getState().auth.reduxAccessToken;
 
-    if (!token) {
-        setAuthHeader(null);
-        return config;
-    }
+        if (!token) {
+            setAuthHeader(null);
+            return config;
+        }
 
-    try {
-        const { exp } = jwtDecode(token);
+        try {
+            const { exp } = jwtDecode(token);
 
-        // Token hết hạn -> refresh
-        if (Date.now() >= exp * 1000) {
-            if (!isRefreshing) {
-                isRefreshing = true;
+            // Token hết hạn -> refresh
+            if (Date.now() >= exp * 1000) {
+                if (!isRefreshing) {
+                    isRefreshing = true;
 
-                try {
-                    const res = await axios.get(`${BASE_URL}/auth/access-token`, { withCredentials: true });
-                    const newToken = res.data.accessToken;
+                    try {
+                        const res = await axios.get(`${BASE_URL}/auth/access-token`, { withCredentials: true });
+                        const newToken = res.data.accessToken;
 
-                    store.dispatch(setReduxAccessToken(newToken));
-                    setAuthHeader(newToken);
-                    processQueue(null, newToken);
+                        store.dispatch(setReduxAccessToken(newToken));
+                        setAuthHeader(newToken);
+                        processQueue(null, newToken);
 
-                    return {
-                        ...config,
-                        headers: {
-                            ...config.headers,
-                            'Authorization': `Bearer ${newToken}`,
-                        },
-                    };
-                } catch (err) {
-                    processQueue(err, null);
-                    store.dispatch(setReduxAccessToken(null));
-                    setAuthHeader(null);
-                    return Promise.reject(err);
-                } finally {
-                    isRefreshing = false;
-                }
-            }
-
-            // Có request khác đang refresh -> đợi xong
-            return new Promise((resolve, reject) => {
-                failedQueue.push({
-                    resolve: (token) => {
-                        resolve({
+                        return {
                             ...config,
                             headers: {
                                 ...config.headers,
-                                'Authorization': token ? `Bearer ${token}` : undefined,
+                                Authorization: `Bearer ${newToken}`,
                             },
-                        });
-                    },
-                    reject: (err) => reject(err),
+                        };
+                    } catch (err) {
+                        processQueue(err, null);
+                        store.dispatch(setReduxAccessToken(null));
+                        setAuthHeader(null);
+                        return Promise.reject(err);
+                    } finally {
+                        isRefreshing = false;
+                    }
+                }
+
+                // Có request khác đang refresh -> đợi xong
+                return new Promise((resolve, reject) => {
+                    failedQueue.push({
+                        resolve: (token) => {
+                            resolve({
+                                ...config,
+                                headers: {
+                                    ...config.headers,
+                                    Authorization: token ? `Bearer ${token}` : undefined,
+                                },
+                            });
+                        },
+                        reject: (err) => reject(err),
+                    });
                 });
-            });
-        } else {
-            // Token còn hạn
-            setAuthHeader(token);
-            return {
-                ...config,
-                headers: {
-                    ...config.headers,
-                    'Authorization': `Bearer ${token}`,
-                },
-            };
+            } else {
+                // Token còn hạn
+                setAuthHeader(token);
+                return {
+                    ...config,
+                    headers: {
+                        ...config.headers,
+                        Authorization: `Bearer ${token}`,
+                    },
+                };
+            }
+        } catch (error) {
+            console.warn('⚠️ Error decoding token:', error);
+            store.dispatch(setReduxAccessToken(null));
+            setAuthHeader(null);
+            return config;
         }
-    } catch (error) {
-        console.warn('⚠️ Error decoding token:', error);
-        store.dispatch(setReduxAccessToken(null));
-        setAuthHeader(null);
-        return config;
-    }
-}, (error) => Promise.reject(error));
+    },
+    (error) => Promise.reject(error)
+);
 
 // --- Export helper để update token thủ công ---
 export const updateAuthHeader = (token) => {
