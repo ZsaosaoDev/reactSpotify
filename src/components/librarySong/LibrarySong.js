@@ -90,6 +90,7 @@ const LibrarySong = () => {
             document.removeEventListener('contextmenu', handleContextMenu);
             document.removeEventListener('click', handleClick);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [menuPosition, reduxLibrarySong]);
 
     // Keyboard accessibility
@@ -107,7 +108,7 @@ const LibrarySong = () => {
 
     // Handle notification display
     const showNotification = (message) => {
-        setNotificationData(`${message} ${Date.now()}`);
+        setNotificationData(message);
         setNotificationKey((prev) => prev + 1);
     };
 

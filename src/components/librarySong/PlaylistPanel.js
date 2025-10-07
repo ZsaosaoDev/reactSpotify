@@ -1,14 +1,20 @@
 import { addSongToPlaylist, createPlaylistWithSong } from '~/apis/songApi';
 import { IconPlus, IconSearch } from '~/assets/image/icons';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { normalizeString } from '~/util/stringUtil';
 import './PlaylistPanel.sass';
 
 const PlaylistPanel = ({ position, playlists, songId, onClose, onNotification, onMouseEnter, onMouseLeave }) => {
-    // Handle playlist selection
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredPlaylists = useMemo(() => {
+        if (!searchTerm.trim()) return playlists;
+        const normalizedSearch = normalizeString(searchTerm);
+        return playlists.filter((p) => normalizeString(p.name).includes(normalizedSearch));
+    }, [playlists, searchTerm]);
+
     const handlePlaylistSelect = async (e, playlistId) => {
         e.stopPropagation();
-        console.log('Selected playlist ID:', playlistId);
-
         try {
             const res = await addSongToPlaylist(playlistId, songId);
             onNotification(res.message || res);
@@ -16,27 +22,20 @@ const PlaylistPanel = ({ position, playlists, songId, onClose, onNotification, o
             console.error('Failed to add to playlist:', err);
             onNotification('Failed to add song to playlist');
         }
-
         onClose();
     };
 
-    // Handle new playlist creation
     const handleCreateNewPlaylist = async (e) => {
         e.stopPropagation();
-        console.log('Creating new playlist...');
-
         try {
             const res = await createPlaylistWithSong(songId);
-            console.log(res);
             onNotification(res.message || `Created playlist ${res.name}`);
         } catch (err) {
             onNotification('Failed to create playlist');
         }
-
         onClose();
     };
 
-    // Focus playlist list on mount
     useEffect(() => {
         const playlistList = document.querySelector('.playlist-list');
         if (playlistList) {
@@ -61,13 +60,14 @@ const PlaylistPanel = ({ position, playlists, songId, onClose, onNotification, o
             <div className="header">
                 <div className="search">
                     <IconSearch height={14} className="icon" />
-                    <input type="text" placeholder="Find a playlist" />
+                    <input type="text" placeholder="Find a playlist" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                 </div>
                 <div className="new-playlist" onClick={handleCreateNewPlaylist}>
                     <IconPlus height={14} className="icon" />
                     <span>New Playlist</span>
                 </div>
             </div>
+
             <div
                 className="playlist-list"
                 tabIndex={0}
@@ -79,24 +79,17 @@ const PlaylistPanel = ({ position, playlists, songId, onClose, onNotification, o
                         const current = document.activeElement;
                         const index = Array.from(items).indexOf(current);
                         const nextIndex = e.key === 'ArrowDown' ? index + 1 : index - 1;
-                        if (items[nextIndex]) {
-                            items[nextIndex].focus();
-                        }
+                        if (items[nextIndex]) items[nextIndex].focus();
                     }
                 }}>
-                {playlists.length > 0 ? (
-                    playlists.map((playlist) => (
-                        <div
-                            key={playlist.id}
-                            role="menuitem"
-                            className="playlist-item"
-                            tabIndex={-1} // Allow individual items to be focusable
-                            onClick={(e) => handlePlaylistSelect(e, playlist.id)}>
+                {filteredPlaylists.length > 0 ? (
+                    filteredPlaylists.map((playlist) => (
+                        <div key={playlist.id} role="menuitem" className="playlist-item" tabIndex={-1} onClick={(e) => handlePlaylistSelect(e, playlist.id)}>
                             {playlist.name}
                         </div>
                     ))
                 ) : (
-                    <div className="playlist-item">No playlists available</div>
+                    <div className="playlist-item">No playlists found</div>
                 )}
             </div>
         </div>
