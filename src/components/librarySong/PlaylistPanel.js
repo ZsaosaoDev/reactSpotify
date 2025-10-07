@@ -1,5 +1,6 @@
 import { addSongToPlaylist, createPlaylistWithSong } from '~/apis/songApi';
 import { IconPlus, IconSearch } from '~/assets/image/icons';
+import { useEffect } from 'react';
 import './PlaylistPanel.sass';
 
 const PlaylistPanel = ({ position, playlists, songId, onClose, onNotification, onMouseEnter, onMouseLeave }) => {
@@ -19,6 +20,7 @@ const PlaylistPanel = ({ position, playlists, songId, onClose, onNotification, o
         onClose();
     };
 
+    // Handle new playlist creation
     const handleCreateNewPlaylist = async (e) => {
         e.stopPropagation();
         console.log('Creating new playlist...');
@@ -26,14 +28,21 @@ const PlaylistPanel = ({ position, playlists, songId, onClose, onNotification, o
         try {
             const res = await createPlaylistWithSong(songId);
             console.log(res);
-            onNotification(res.message || 'Created playlist' + res.name);
+            onNotification(res.message || `Created playlist ${res.name}`);
         } catch (err) {
             onNotification('Failed to create playlist');
         }
 
-        // Đóng panel sau khi tạo xong
         onClose();
     };
+
+    // Focus playlist list on mount
+    useEffect(() => {
+        const playlistList = document.querySelector('.playlist-list');
+        if (playlistList) {
+            playlistList.focus();
+        }
+    }, []);
 
     return (
         <div
@@ -46,6 +55,7 @@ const PlaylistPanel = ({ position, playlists, songId, onClose, onNotification, o
                 e.stopPropagation();
                 onClose();
             }}
+            onWheel={(e) => e.stopPropagation()}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}>
             <div className="header">
@@ -58,10 +68,30 @@ const PlaylistPanel = ({ position, playlists, songId, onClose, onNotification, o
                     <span>New Playlist</span>
                 </div>
             </div>
-            <div className="playlist-list">
+            <div
+                className="playlist-list"
+                tabIndex={0}
+                onWheel={(e) => e.stopPropagation()}
+                onKeyDown={(e) => {
+                    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const items = document.querySelectorAll('.playlist-item');
+                        const current = document.activeElement;
+                        const index = Array.from(items).indexOf(current);
+                        const nextIndex = e.key === 'ArrowDown' ? index + 1 : index - 1;
+                        if (items[nextIndex]) {
+                            items[nextIndex].focus();
+                        }
+                    }
+                }}>
                 {playlists.length > 0 ? (
                     playlists.map((playlist) => (
-                        <div key={playlist.id} role="menuitem" className="playlist-item" onClick={(e) => handlePlaylistSelect(e, playlist.id)}>
+                        <div
+                            key={playlist.id}
+                            role="menuitem"
+                            className="playlist-item"
+                            tabIndex={-1} // Allow individual items to be focusable
+                            onClick={(e) => handlePlaylistSelect(e, playlist.id)}>
                             {playlist.name}
                         </div>
                     ))

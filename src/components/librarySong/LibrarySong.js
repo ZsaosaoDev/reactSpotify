@@ -29,6 +29,18 @@ const LibrarySong = () => {
         loadPlaylists();
     }, []);
 
+    // Handle body overflow when menu is open
+    useEffect(() => {
+        if (menuPosition) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [menuPosition]);
+
     // Close menu and clean redux
     const handleCloseMenu = () => {
         setMenuPosition(null);
@@ -40,7 +52,6 @@ const LibrarySong = () => {
         const handleContextMenu = (e) => {
             e.preventDefault();
 
-            // Check if type is valid before opening menu
             const isValidType = reduxLibrarySong?.type && ['playlist', 'artist', 'album'].includes(reduxLibrarySong.type);
 
             if (!isValidType) {
@@ -48,14 +59,12 @@ const LibrarySong = () => {
                 return;
             }
 
-            // If menu is already open, close it
             if (menuPosition) {
                 console.log('Menu already open, closing it');
                 handleCloseMenu();
                 return;
             }
 
-            // Open new menu with viewport boundary check
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
             const menuWidth = 200;
@@ -81,7 +90,6 @@ const LibrarySong = () => {
             document.removeEventListener('contextmenu', handleContextMenu);
             document.removeEventListener('click', handleClick);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [menuPosition, reduxLibrarySong]);
 
     // Keyboard accessibility
@@ -106,7 +114,6 @@ const LibrarySong = () => {
     return (
         <div className="library-song-container">
             <Notification key={notificationKey} message={notificationData} setNotificationData={setNotificationData} />
-
             {menuPosition && <ContextMenu position={menuPosition} reduxData={reduxLibrarySong} playlists={playlists} onClose={handleCloseMenu} onNotification={showNotification} />}
         </div>
     );

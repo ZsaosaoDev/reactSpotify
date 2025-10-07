@@ -58,7 +58,11 @@
         cursor: pointer
         transition: background-color 0.2s
         max-height: 200px
-        overflow-y: scroll
+        overflow-y: auto
+        outline: none
+
+        &:focus
+            outline: none
 
         &::-webkit-scrollbar
             width: 8px
@@ -66,6 +70,12 @@
         &::-webkit-scrollbar-track
             background: var(--gray-lv1)
 
+        &::-webkit-scrollbar-thumb
+            background: var(--gray-lv2)
+            border-radius: 4px
+
+        &::-webkit-scrollbar-thumb:hover
+            background: var(--gray-lv3)
 
         .playlist-item
             padding: 8px 10px
