@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { IconPlus, IconSearch } from '~/assets/image/icons';
 import { addSongToPlaylist, createPlaylistWithSong } from '~/apis/songApi';
 import { normalizeString } from '~/util/stringUtil';
+import { setReduxRefresh } from '~/redux/reducer/songNotWhitelistSlice';
 import './PlaylistPanel.sass';
 
 const PlaylistPanel = ({ position, playlists, onClose, onNotification, onMouseEnter, onMouseLeave }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const reduxLibrarySong = useSelector((state) => state.songNotWhite.reduxLibrarySong);
+    const dispatch = useDispatch();
 
     const filteredPlaylists = useMemo(() => {
         if (!searchTerm.trim()) return playlists;
@@ -30,6 +32,7 @@ const PlaylistPanel = ({ position, playlists, onClose, onNotification, onMouseEn
                 if (item.type === 'playlist') {
                     const res = await addSongToPlaylist(playlistId, item.id);
                     onNotification(res);
+                    dispatch(setReduxRefresh());
                 }
             }
         } catch (err) {
@@ -52,6 +55,7 @@ const PlaylistPanel = ({ position, playlists, onClose, onNotification, onMouseEn
             for (const item of reduxLibrarySong) {
                 if (item.type === 'playlist') {
                     await createPlaylistWithSong(item.id);
+                    dispatch(setReduxRefresh());
                     onNotification('Create playlist success');
                 }
             }

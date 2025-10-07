@@ -5,6 +5,7 @@ const initialState = {
     reduxDuration: 0,
     reduxIsRight: false,
     reduxLibrarySong: [], // { type: '', id: '' }
+    reduxRefresh: 0,
 };
 
 const songNotWhiteListSlice = createSlice({
@@ -36,8 +37,11 @@ const songNotWhiteListSlice = createSlice({
         cleanReduxLibrarySong: (state) => {
             state.reduxLibrarySong = [];
         },
+        setReduxRefresh: (state, action) => {
+            state.reduxRefresh += 1;
+        },
     },
 });
 
-export const { setReduxIsRight, setReduxCurrentTime, setReduxIsPlaying, setReduxLibrarySong, cleanReduxLibrarySong } = songNotWhiteListSlice.actions;
+export const { setReduxIsRight, setReduxCurrentTime, setReduxIsPlaying, setReduxLibrarySong, cleanReduxLibrarySong, setReduxRefresh } = songNotWhiteListSlice.actions;
 export default songNotWhiteListSlice.reducer;

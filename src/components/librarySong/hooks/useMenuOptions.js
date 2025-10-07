@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { follow } from '~/apis/songApi';
 import { IconFollow, IconPlusCircle, IconTriangle } from '~/assets/image/icons';
-import { useSelector } from 'react-redux';
+import { setReduxRefresh } from '~/redux/reducer/songNotWhitelistSlice';
 
 export const useMenuOptions = (reduxData, onNotification) => {
+    const dispatch = useDispatch();
     const reduxLibrarySong = useSelector((state) => state.songNotWhite.reduxLibrarySong);
     return useMemo(() => {
         if (!Array.isArray(reduxData) || reduxData.length === 0) {
@@ -57,6 +59,7 @@ export const useMenuOptions = (reduxData, onNotification) => {
                             for (const item of reduxLibrarySong) {
                                 if (item.type === 'artist') {
                                     const res = await follow(item.id, 'ARTIST');
+                                    dispatch(setReduxRefresh());
                                     onNotification(res);
                                 }
                             }

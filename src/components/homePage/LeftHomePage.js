@@ -1,4 +1,4 @@
-import { IconShrink, IconWiden, IconSearch, IconList, IconClose } from '~/assets/image/icons';
+import { IconSearch, IconList, IconClose } from '~/assets/image/icons';
 import './LeftHomePage.sass';
 import { useSelector } from 'react-redux';
 import { useEffect, useState, useCallback } from 'react';
