@@ -1,7 +1,7 @@
 import { IconShrink, IconWiden, IconSearch, IconList, IconClose } from '~/assets/image/icons';
 import './LeftHomePage.sass';
 import { useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { followed } from '~/apis/songApi';
 
 const LeftHomePage = () => {
@@ -14,57 +14,40 @@ const LeftHomePage = () => {
     const [filter, setFilter] = useState('all'); // 'all', 'playlists', 'artists', 'albums'
     const [searchQuery, setSearchQuery] = useState('');
 
+    const handleFilterClick = (type) => {
+        setFilter((prev) => (prev === type ? 'all' : type));
+    };
+
+    const fetchFollowed = useCallback(async () => {
+        try {
+            const res = await followed();
+            console.log('Followed:', res);
+            setFollowedData(res);
+        } catch (error) {
+            console.error('Error fetching followed:', error);
+        }
+    }, []);
+
     useEffect(() => {
-        const fetchFollowed = async () => {
-            try {
-                const res = await followed();
-                console.log(res);
-                setFollowedData(res);
-            } catch (error) {
-                console.error('Error fetching followed:', error);
-            }
-        };
-
         fetchFollowed();
-    }, [reduxRefresh]);
+    }, [reduxRefresh, fetchFollowed]);
 
-    // Filter items based on search query
+    // ✅ Search filtering
     const filterBySearch = (items, type) => {
         if (!searchQuery) return items;
-
         return items.filter((item) => {
-            const searchText = type === 'artist' ? (item.userName || 'Unknown Artist').toLowerCase() : item.name.toLowerCase();
+            const searchText = type === 'artist' ? (item.userName || 'Unknown Artist').toLowerCase() : (item.name || '').toLowerCase();
             return searchText.includes(searchQuery.toLowerCase());
         });
     };
 
-    // Get filtered playlists
-    const getFilteredPlaylists = () => {
-        if (filter !== 'all' && filter !== 'playlists') return [];
-        return filterBySearch(followedData.playlistFollowed, 'playlist');
-    };
+    const filteredPlaylists = (filter === 'all' || filter === 'playlists') && filterBySearch(followedData.playlistFollowed, 'playlist');
 
-    // Get filtered artists
-    const getFilteredArtists = () => {
-        if (filter !== 'all' && filter !== 'artists') return [];
-        return filterBySearch(followedData.artistFollowed, 'artist');
-    };
+    const filteredArtists = (filter === 'all' || filter === 'artists') && filterBySearch(followedData.artistFollowed, 'artist');
 
-    // Get filtered albums
-    const getFilteredAlbums = () => {
-        if (filter !== 'all' && filter !== 'albums') return [];
-        return filterBySearch(followedData.albumFollowed, 'album');
-    };
+    const filteredAlbums = (filter === 'all' || filter === 'albums') && filterBySearch(followedData.albumFollowed, 'album');
 
-    const filteredPlaylists = getFilteredPlaylists();
-    const filteredArtists = getFilteredArtists();
-    const filteredAlbums = getFilteredAlbums();
-
-    const hasResults = filteredPlaylists.length > 0 || filteredArtists.length > 0 || filteredAlbums.length > 0;
-
-    const handleClearSearch = () => {
-        setSearchQuery('');
-    };
+    const hasResults = (filteredPlaylists?.length || 0) + (filteredArtists?.length || 0) + (filteredAlbums?.length || 0) > 0;
 
     return (
         <div className="leftHomePage">
@@ -77,18 +60,16 @@ const LeftHomePage = () => {
                 </div>
             </div>
 
+            {/* FILTER BUTTONS */}
             <div className="filters">
-                <div className={`filterItem ${filter === 'playlists' ? 'active' : ''}`} onClick={() => setFilter(filter === 'playlists' ? 'all' : 'playlists')}>
-                    Playlists
-                </div>
-                <div className={`filterItem ${filter === 'artists' ? 'active' : ''}`} onClick={() => setFilter(filter === 'artists' ? 'all' : 'artists')}>
-                    Artists
-                </div>
-                <div className={`filterItem ${filter === 'albums' ? 'active' : ''}`} onClick={() => setFilter(filter === 'albums' ? 'all' : 'albums')}>
-                    Albums
-                </div>
+                {['playlists', 'artists', 'albums'].map((type) => (
+                    <div key={type} className={`filterItem ${filter === type ? 'active' : ''}`} onClick={() => handleFilterClick(type)}>
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </div>
+                ))}
             </div>
 
+            {/* SEARCH BAR */}
             <div className="searchList">
                 <div className={`searchBox ${searchQuery ? 'hasText' : ''}`}>
                     <div className="searchIcon">
@@ -96,11 +77,10 @@ const LeftHomePage = () => {
                     </div>
                     <input className="searchInput" type="text" placeholder="Search in Your Library" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                     {searchQuery && (
-                        <div className="clearSearchBtn" onClick={handleClearSearch}>
+                        <div className="clearSearchBtn" onClick={() => setSearchQuery('')}>
                             <IconClose height={16} />
                         </div>
                     )}
-                    <div className="searchOverlay"></div>
                 </div>
                 <div className="recentList">
                     <div className="recentTitle">Recent</div>
@@ -108,15 +88,16 @@ const LeftHomePage = () => {
                 </div>
             </div>
 
+            {/* CONTENT */}
             <div className="followedContent">
                 {!hasResults ? (
                     <div className="emptyState">{searchQuery ? `No results found for "${searchQuery}"` : 'No items found'}</div>
                 ) : (
                     <>
-                        {/* Render Playlists Section */}
-                        {filteredPlaylists.length > 0 && (
+                        {/* Playlists */}
+                        {filteredPlaylists?.length > 0 && (
                             <div className="followedSection">
-                                {filter === 'all' && <div className="sectionTitle">Playlists</div>}
+                                <div className="sectionTitle">Playlists</div>
                                 <div className="followedList">
                                     {filteredPlaylists.map((playlist) => (
                                         <div key={`playlist-${playlist.id}`} className="followedItem">
@@ -135,10 +116,10 @@ const LeftHomePage = () => {
                             </div>
                         )}
 
-                        {/* Render Artists Section */}
-                        {filteredArtists.length > 0 && (
+                        {/* Artists */}
+                        {filteredArtists?.length > 0 && (
                             <div className="followedSection">
-                                {filter === 'all' && <div className="sectionTitle">Artists</div>}
+                                <div className="sectionTitle">Artists</div>
                                 <div className="followedList">
                                     {filteredArtists.map((artist) => (
                                         <div key={`artist-${artist.id}`} className="followedItem">
@@ -155,10 +136,10 @@ const LeftHomePage = () => {
                             </div>
                         )}
 
-                        {/* Render Albums Section */}
-                        {filteredAlbums.length > 0 && (
+                        {/* Albums */}
+                        {filteredAlbums?.length > 0 && (
                             <div className="followedSection">
-                                {filter === 'all' && <div className="sectionTitle">Albums</div>}
+                                <div className="sectionTitle">Albums</div>
                                 <div className="followedList">
                                     {filteredAlbums.map((album) => (
                                         <div key={`album-${album.id}`} className="followedItem">

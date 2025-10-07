@@ -71,12 +71,10 @@ const CenterHomePage = () => {
                 const res = await getSongAndArtistBySongId(songId);
                 dispatch(addNextSong(res));
 
-                // ✅ set index trực tiếp để Redux nhận thay đổi
                 dispatch(setReduxCurrentSongIndex(0));
                 dispatch(setReduxIsRight(true));
                 dispatch(setReduxIsPlaying(true));
 
-                // ✅ cập nhật lại lịch sử sau khi play
                 await updateHistory();
             } catch (err) {
                 console.error('Error playing song:', err);
