@@ -1,7 +1,7 @@
 import api from './api';
 
 async function uploadSong(formData) {
-    const res = await api.post('/artist/songs', formData, {
+    const res = await api.post('/artist/upload-song', formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
