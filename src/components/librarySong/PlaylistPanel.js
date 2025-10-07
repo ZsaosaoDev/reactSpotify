@@ -51,8 +51,8 @@ const PlaylistPanel = ({ position, playlists, onClose, onNotification, onMouseEn
         try {
             for (const item of reduxLibrarySong) {
                 if (item.type === 'playlist') {
-                    const res = await createPlaylistWithSong(item.id);
-                    onNotification(res);
+                    await createPlaylistWithSong(item.id);
+                    onNotification('Create playlist success');
                 }
             }
         } catch (err) {

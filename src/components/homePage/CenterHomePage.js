@@ -277,7 +277,7 @@ const CenterHomePage = () => {
                                 {topArtists.map((artist) => (
                                     <div key={artist.id} className="artistItem" onClick={() => navigate(`/artist/${artist.id}`)}>
                                         <div className="artistImage">
-                                            <img src={artist.avatarUrl} alt={artist.username} />
+                                            <img src={artist.urlAvatar} alt={artist.username} />
                                         </div>
                                         <div className="artistName">{artist.username || 'No name'}</div>
                                     </div>

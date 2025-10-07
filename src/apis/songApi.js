@@ -170,6 +170,15 @@ async function createPlaylistWithSong(songId) {
     }
 }
 
+async function followed() {
+    try {
+        const res = await api.get('user/followed');
+        return res.data;
+    } catch (err) {
+        throw err;
+    }
+}
+
 export {
     uploadSong,
     getAllSongGenres,
@@ -188,4 +197,5 @@ export {
     deleteSongFromPlaylist,
     getMyPlaylists,
     createPlaylistWithSong,
+    followed,
 };

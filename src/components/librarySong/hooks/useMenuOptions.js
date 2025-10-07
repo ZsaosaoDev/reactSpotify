@@ -86,7 +86,7 @@ export const useMenuOptions = (reduxData, onNotification) => {
 
         return options;
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [reduxData]);
+    }, [reduxData, reduxLibrarySong]);
 };
 
 export default useMenuOptions;
