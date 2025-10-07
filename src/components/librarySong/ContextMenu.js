@@ -85,7 +85,7 @@ const ContextMenu = ({ position, reduxData, playlists, onClose, onNotification }
                 ))}
             </div>
 
-            {playlistPanelPosition && <PlaylistPanel position={playlistPanelPosition} playlists={playlists} songId={reduxData.id} onClose={onClose} onNotification={onNotification} />}
+            {playlistPanelPosition && <PlaylistPanel position={playlistPanelPosition} playlists={playlists} onClose={onClose} onNotification={onNotification} />}
         </>
     );
 };

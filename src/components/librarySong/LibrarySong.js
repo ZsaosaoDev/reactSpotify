@@ -52,10 +52,17 @@ const LibrarySong = () => {
         const handleContextMenu = (e) => {
             e.preventDefault();
 
-            const isValidType = reduxLibrarySong?.type && ['playlist', 'artist', 'album'].includes(reduxLibrarySong.type);
+            // Check if reduxLibrarySong is an array and has valid items
+            if (!Array.isArray(reduxLibrarySong) || reduxLibrarySong.length === 0) {
+                console.log('No items selected, not opening menu');
+                return;
+            }
 
-            if (!isValidType) {
-                console.log('Invalid type, not opening menu');
+            // Validate all items have valid type
+            const hasInvalidType = reduxLibrarySong.some((item) => !item.type || !['playlist', 'artist', 'album'].includes(item.type));
+
+            if (hasInvalidType) {
+                console.log('Invalid type detected, not opening menu');
                 return;
             }
 
@@ -71,7 +78,8 @@ const LibrarySong = () => {
             const menuHeight = 100;
             const x = Math.min(e.clientX, windowWidth - menuWidth);
             const y = Math.min(e.clientY, windowHeight - menuHeight);
-            console.log('Opening context menu at:', { x, y });
+
+            console.log('Opening context menu at:', { x, y }, 'for items:', reduxLibrarySong);
             setMenuPosition({ x, y });
         };
 

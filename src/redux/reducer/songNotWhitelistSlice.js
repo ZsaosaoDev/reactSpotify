@@ -4,7 +4,7 @@ const initialState = {
     reduxIsPlaying: false,
     reduxDuration: 0,
     reduxIsRight: false,
-    reduxLibrarySong: {}, // { type: '', id: '' }
+    reduxLibrarySong: [], // { type: '', id: '' }
 };
 
 const songNotWhiteListSlice = createSlice({
@@ -24,11 +24,17 @@ const songNotWhiteListSlice = createSlice({
             state.reduxIsPlaying = action.payload;
         },
         setReduxLibrarySong: (state, action) => {
-            const { type, id } = action.payload;
-            state.reduxLibrarySong = { type, id };
+            const newItems = Array.isArray(action.payload) ? action.payload : [action.payload];
+
+            newItems.forEach(({ type, id }) => {
+                const exists = state.reduxLibrarySong.some((item) => item.type === type && item.id === id);
+                if (!exists) {
+                    state.reduxLibrarySong.push({ type, id });
+                }
+            });
         },
         cleanReduxLibrarySong: (state) => {
-            state.reduxLibrarySong = {};
+            state.reduxLibrarySong = [];
         },
     },
 });

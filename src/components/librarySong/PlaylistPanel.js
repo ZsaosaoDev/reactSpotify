@@ -3,9 +3,11 @@ import { IconPlus, IconSearch } from '~/assets/image/icons';
 import { useEffect, useMemo, useState } from 'react';
 import { normalizeString } from '~/util/stringUtil';
 import './PlaylistPanel.sass';
+import { useSelector } from 'react-redux';
 
-const PlaylistPanel = ({ position, playlists, songId, onClose, onNotification, onMouseEnter, onMouseLeave }) => {
+const PlaylistPanel = ({ position, playlists, onClose, onNotification, onMouseEnter, onMouseLeave }) => {
     const [searchTerm, setSearchTerm] = useState('');
+    const reduxLibrarySong = useSelector((state) => state.songNotWhite.reduxLibrarySong);
 
     const filteredPlaylists = useMemo(() => {
         if (!searchTerm.trim()) return playlists;
@@ -15,9 +17,20 @@ const PlaylistPanel = ({ position, playlists, songId, onClose, onNotification, o
 
     const handlePlaylistSelect = async (e, playlistId) => {
         e.stopPropagation();
+
+        if (!Array.isArray(reduxLibrarySong) || reduxLibrarySong.length === 0) {
+            onNotification('No songs selected');
+            onClose();
+            return;
+        }
+
         try {
-            const res = await addSongToPlaylist(playlistId, songId);
-            onNotification(res.message || res);
+            // Loop through all songs and add to playlist
+            for (const item of reduxLibrarySong) {
+                const songId = item.id;
+                const res = await addSongToPlaylist(playlistId, songId);
+                onNotification(res);
+            }
         } catch (err) {
             console.error('Failed to add to playlist:', err);
             onNotification('Failed to add song to playlist');
@@ -27,10 +40,20 @@ const PlaylistPanel = ({ position, playlists, songId, onClose, onNotification, o
 
     const handleCreateNewPlaylist = async (e) => {
         e.stopPropagation();
+
+        if (!Array.isArray(reduxLibrarySong) || reduxLibrarySong.length === 0) {
+            onNotification('No songs selected');
+            onClose();
+            return;
+        }
+
         try {
-            const res = await createPlaylistWithSong(songId);
-            onNotification(res.message || `Created playlist ${res.name}`);
+            // Create playlist with first song, then add remaining songs
+            const firstSongId = reduxLibrarySong[0].id;
+            const res = await createPlaylistWithSong(firstSongId);
+            onNotification(res);
         } catch (err) {
+            console.error('Failed to create playlist:', err);
             onNotification('Failed to create playlist');
         }
         onClose();
