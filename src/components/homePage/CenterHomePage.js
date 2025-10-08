@@ -5,7 +5,13 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Slider from '~/components/slider/Slider';
-import { getAlbumWithSongs, getArtistWithSongs, getListeningHistory, getSongAndArtistBySongId, getTrendingAlbums, getTrendingArtists, getTrendingSongs } from '~/apis/songApi';
+import {
+    getListeningHistory,
+    getSongAndArtistBySongId,
+    getTrendingAlbums,
+    getTrendingArtists,
+    getTrendingSongs,
+} from '~/apis/songApi';
 import { setReduxIsPlaying, setReduxIsRight, setReduxLibrarySong } from '~/redux/reducer/songNotWhitelistSlice';
 import { addNextSong, addSongList, clearSongs, setReduxCurrentSongIndex } from '~/redux/reducer/songSlice';
 import NoAvatar from '~/assets/image/noAvatar.png';
@@ -28,14 +34,16 @@ const CenterHomePage = () => {
     const [listeningHistory, setListeningHistory] = useState([]);
     const [pageType, setPageType] = useState(null);
     const [pageId, setPageId] = useState(null);
-    const [albumData, setAlbumData] = useState(null);
-    const [artistData, setArtistData] = useState(null);
 
     // ================== FETCH DATA TRENDING ==================
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [songs, albums, artists] = await Promise.all([getTrendingSongs(), getTrendingAlbums(), getTrendingArtists()]);
+                const [songs, albums, artists] = await Promise.all([
+                    getTrendingSongs(),
+                    getTrendingAlbums(),
+                    getTrendingArtists(),
+                ]);
                 setTrendingSongs(songs);
                 setTopAlbums(albums);
                 setTopArtists(artists);
@@ -84,7 +92,7 @@ const CenterHomePage = () => {
         [dispatch, updateHistory]
     );
 
-    // ================== PLAY ALBUM SONG ==================
+    // ================== MERGE ARTIST TO SONG ==================
     const mergeArtistToSong = useCallback((data) => {
         return data.songs.map((song) => ({
             song: {
@@ -95,18 +103,19 @@ const CenterHomePage = () => {
         }));
     }, []);
 
-    const listenListSong = useCallback(
-        async (e, songId) => {
+    // ================== PLAY LIST SONG (COMMON) ==================
+    const playListSong = useCallback(
+        async (e, songId, dataSource) => {
             e.stopPropagation();
-            if (!albumData) return;
+            if (!dataSource) return;
 
-            const currentIndex = albumData.songs.findIndex((song) => song.id === songId);
+            const currentIndex = dataSource.songs.findIndex((song) => song.id === songId);
             if (currentIndex === -1) return;
 
             dispatch(clearSongs());
             dispatch(
                 addSongList({
-                    songs: mergeArtistToSong(albumData),
+                    songs: mergeArtistToSong(dataSource),
                     currentIndex,
                 })
             );
@@ -115,31 +124,7 @@ const CenterHomePage = () => {
 
             await updateHistory();
         },
-        [albumData, dispatch, mergeArtistToSong, updateHistory]
-    );
-
-    // ================== PLAY ARTIST SONG ==================
-    const listenArtist = useCallback(
-        async (e, songId) => {
-            e.stopPropagation();
-            if (!artistData) return;
-
-            const currentIndex = artistData.songs.findIndex((song) => song.id === songId);
-            if (currentIndex === -1) return;
-
-            dispatch(clearSongs());
-            dispatch(
-                addSongList({
-                    songs: mergeArtistToSong(artistData),
-                    currentIndex,
-                })
-            );
-            dispatch(setReduxIsRight(true));
-            dispatch(setReduxIsPlaying(true));
-
-            await updateHistory();
-        },
-        [artistData, dispatch, mergeArtistToSong, updateHistory]
+        [dispatch, mergeArtistToSong, updateHistory]
     );
 
     // ================== PAGE TYPE DETECT ==================
@@ -156,36 +141,7 @@ const CenterHomePage = () => {
         }
     }, [location.pathname]);
 
-    // ================== FETCH PAGE DATA ==================
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                if (pageType === 'album' && pageId) {
-                    const data = await getAlbumWithSongs(pageId);
-                    setAlbumData(data);
-                } else if (pageType === 'artist' && pageId) {
-                    const data = await getArtistWithSongs(pageId);
-                    setArtistData(data);
-                } else {
-                    setAlbumData(null);
-                    setArtistData(null);
-                }
-                dispatch(setReduxIsRight(false));
-            } catch (err) {
-                console.error(`Error fetching ${pageType} data:`, err);
-            }
-        };
-        fetchData();
-    }, [pageType, pageId, dispatch]);
-
-    // ================== HANDLE ALBUM CLICK ==================
-    const handleAlbum = useCallback(
-        (albumId) => {
-            navigate(`/album/${albumId}`);
-        },
-        [navigate]
-    );
-
+    // ================== HANDLE LIBRARY SONG ==================
     const handleLibrarySong = (e, payload) => {
         e.preventDefault();
         dispatch(setReduxLibrarySong(payload));
@@ -195,9 +151,21 @@ const CenterHomePage = () => {
     const renderContent = () => {
         switch (pageType) {
             case 'album':
-                return albumData ? <AlbumView albumData={albumData} onPlayListSong={listenListSong} /> : null;
+                return pageId ? (
+                    <AlbumView
+                        albumId={Number(pageId)}
+                        onPlayListSong={playListSong}
+                        handleLibrarySong={handleLibrarySong}
+                    />
+                ) : null;
             case 'artist':
-                return artistData ? <ArtistSongList albumData={artistData} onPlayListSong={listenArtist} /> : null;
+                return pageId ? (
+                    <ArtistSongList
+                        artistId={Number(pageId)}
+                        onPlayListSong={playListSong}
+                        handleLibrarySong={handleLibrarySong}
+                    />
+                ) : null;
             default:
                 return (
                     <>
@@ -219,7 +187,6 @@ const CenterHomePage = () => {
                                                     },
                                                 ]);
                                             }}>
-                                            >
                                             <div className="historyImage">
                                                 <img src={item.imageUrl} alt={item.title} />
                                             </div>
@@ -272,7 +239,7 @@ const CenterHomePage = () => {
                                     <div
                                         key={album.id}
                                         className="albumItem"
-                                        onClick={() => handleAlbum(album.id)}
+                                        onClick={() => navigate(`/album/${album.id}`)}
                                         onContextMenu={(e) => {
                                             handleLibrarySong(e, [
                                                 { type: 'album', id: album.id },
@@ -311,7 +278,6 @@ const CenterHomePage = () => {
                                                 },
                                             ]);
                                         }}>
-                                        >
                                         <div className="artistImage">
                                             <img src={artist.urlAvatar} alt={artist.username} />
                                         </div>

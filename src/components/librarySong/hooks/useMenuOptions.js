@@ -8,51 +8,62 @@ import { setReduxRefresh } from '~/redux/reducer/songNotWhitelistSlice';
 export const useMenuOptions = (reduxData, onNotification) => {
     const dispatch = useDispatch();
     const [followedArtists, setFollowedArtists] = useState(null);
+    const [followedAlbums, setFollowedAlbums] = useState(null);
 
     const reduxLibrarySong = useSelector((state) => state.songNotWhite.reduxLibrarySong);
 
-    useEffect(() => {
-        const fetchFollowedArtists = async () => {
-            try {
-                const result = await followedArtistApi();
-                setFollowedArtists(result || []);
-            } catch (error) {
-                console.error('Failed to fetch followed artists:', error);
-                setFollowedArtists([]);
-            }
-        };
-
-        fetchFollowedArtists();
-    }, []);
-
-    const [followedAlbums, setFollowedAlbums] = useState(null);
+    // Kiểm tra xem reduxData có chứa type nào không
+    const hasArtist = useMemo(() => reduxData?.some((item) => item.type === 'artist'), [reduxData]);
+    const hasAlbum = useMemo(() => reduxData?.some((item) => item.type === 'album'), [reduxData]);
 
     useEffect(() => {
         const fetchFollowedData = async () => {
             try {
-                const artists = await followedArtistApi();
-                setFollowedArtists(artists || []);
+                // Chỉ call API nếu cần thiết
+                const promises = [];
 
-                const albums = await followedAlbumApi();
-                setFollowedAlbums(albums || []);
+                if (hasArtist) {
+                    promises.push(
+                        followedArtistApi().then((artists) => {
+                            setFollowedArtists(artists || []);
+                        })
+                    );
+                } else {
+                    setFollowedArtists([]);
+                }
+
+                if (hasAlbum) {
+                    promises.push(
+                        followedAlbumApi().then((albums) => {
+                            console.log(albums);
+                            setFollowedAlbums(albums || []);
+                        })
+                    );
+                } else {
+                    setFollowedAlbums([]);
+                }
+
+                await Promise.all(promises);
             } catch (error) {
                 console.error('Failed to fetch followed data:', error);
-                setFollowedArtists([]);
-                setFollowedAlbums([]);
+                if (hasArtist) setFollowedArtists([]);
+                if (hasAlbum) setFollowedAlbums([]);
             }
         };
 
         fetchFollowedData();
-    }, []);
+    }, [hasArtist, hasAlbum]);
 
     return useMemo(() => {
         if (!Array.isArray(reduxData) || reduxData.length === 0) {
             return [];
         }
 
-        if (followedArtists === null) {
+        // Chỉ check null cho type cần thiết
+        if ((hasArtist && followedArtists === null) || (hasAlbum && followedAlbums === null)) {
             return [];
         }
+
         const options = [];
 
         reduxData.forEach(({ type, id }) => {
@@ -110,8 +121,12 @@ export const useMenuOptions = (reduxData, onNotification) => {
                             for (const item of reduxLibrarySong) {
                                 if (item.type === 'artist') {
                                     try {
-                                        const isArtistFollowed = followedArtists.some((artist) => artist.id === item.id);
-                                        const res = isArtistFollowed ? await unfollow(item.id, 'ARTIST') : await follow(item.id, 'ARTIST');
+                                        const isArtistFollowed = followedArtists.some(
+                                            (artist) => artist.id === item.id
+                                        );
+                                        const res = isArtistFollowed
+                                            ? await unfollow(item.id, 'ARTIST')
+                                            : await follow(item.id, 'ARTIST');
 
                                         dispatch(setReduxRefresh());
                                         onNotification(res);
@@ -130,7 +145,7 @@ export const useMenuOptions = (reduxData, onNotification) => {
                     break;
 
                 case 'album':
-                    const isAlbumFollowed = followedAlbums?.some((album) => album.id === id);
+                    const isAlbumFollowed = followedAlbums.some((album) => album.id === id);
 
                     options.push({
                         label: (
@@ -160,8 +175,10 @@ export const useMenuOptions = (reduxData, onNotification) => {
                             for (const item of reduxLibrarySong) {
                                 if (item.type === 'album') {
                                     try {
-                                        const isItemFollowed = followedAlbums?.some((album) => album.id === item.id);
-                                        const res = isItemFollowed ? await unfollow(item.id, 'ALBUM') : await follow(item.id, 'ALBUM');
+                                        const isItemFollowed = followedAlbums.some((album) => album.id === item.id);
+                                        const res = isItemFollowed
+                                            ? await unfollow(item.id, 'ALBUM')
+                                            : await follow(item.id, 'ALBUM');
 
                                         dispatch(setReduxRefresh());
                                         onNotification(res);
@@ -184,8 +201,7 @@ export const useMenuOptions = (reduxData, onNotification) => {
         });
 
         return options;
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [reduxData, reduxLibrarySong, followedArtists]);
+    }, [reduxData, reduxLibrarySong, followedArtists, followedAlbums, hasArtist, hasAlbum, dispatch, onNotification]);
 };
 
 export default useMenuOptions;

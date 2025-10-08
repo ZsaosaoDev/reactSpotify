@@ -96,9 +96,9 @@ async function getTrendingArtists(page = 0, size = 10, days = 7) {
     }
 }
 
-async function getArtistWithSongs(artistId) {
+async function getArtistWithSongsAndAlbums(artistId) {
     try {
-        const res = await api.get(`open/${artistId}/songs`);
+        const res = await api.get(`open/${artistId}/full`);
         return res.data.content;
     } catch (err) {
         throw err;
@@ -207,7 +207,7 @@ export {
     getTrendingAlbums,
     getAlbumWithSongs,
     getTrendingArtists,
-    getArtistWithSongs,
+    getArtistWithSongsAndAlbums,
     getListeningHistory,
     follow,
     unfollow,
