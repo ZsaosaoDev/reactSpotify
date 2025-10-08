@@ -2,15 +2,31 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { IconPlus, IconSearch } from '~/assets/image/icons';
-import { addSongToPlaylist, createPlaylistWithSong } from '~/apis/songApi';
+import { addSongToPlaylist, createPlaylistWithSong, getMyPlaylists } from '~/apis/songApi';
 import { normalizeString } from '~/util/stringUtil';
 import { setReduxRefresh } from '~/redux/reducer/songNotWhitelistSlice';
 import './PlaylistPanel.sass';
 
-const PlaylistPanel = ({ position, playlists, onClose, onNotification, onMouseEnter, onMouseLeave }) => {
+const PlaylistPanel = ({ position, onClose, onNotification, onMouseEnter, onMouseLeave }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const reduxLibrarySong = useSelector((state) => state.songNotWhite.reduxLibrarySong);
     const dispatch = useDispatch();
+
+    const reduxRefresh = useSelector((state) => state.songNotWhite.reduxRefresh);
+    const reduxIsLogin = useSelector((state) => state.auth.reduxIsLogin);
+    const [playlists, setPlaylists] = useState([]);
+    useEffect(() => {
+        if (!reduxIsLogin) return;
+        const loadPlaylists = async () => {
+            try {
+                const playlistData = await getMyPlaylists();
+                setPlaylists(playlistData);
+            } catch (err) {
+                console.error('Failed to fetch playlists:', err);
+            }
+        };
+        loadPlaylists();
+    }, [reduxIsLogin, reduxRefresh]);
 
     const filteredPlaylists = useMemo(() => {
         if (!searchTerm.trim()) return playlists;

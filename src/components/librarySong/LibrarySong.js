@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { cleanReduxLibrarySong } from '~/redux/reducer/songNotWhitelistSlice';
-import { getMyPlaylists } from '~/apis/songApi';
 import Notification from '~/components/librarySong/Notification';
 import ContextMenu from './ContextMenu';
 import './LibrarySong.sass';
@@ -10,25 +9,9 @@ const LibrarySong = () => {
     const [menuPosition, setMenuPosition] = useState(null);
     const [notificationData, setNotificationData] = useState(null);
     const [notificationKey, setNotificationKey] = useState(0);
-    const [playlists, setPlaylists] = useState([]);
 
     const reduxLibrarySong = useSelector((state) => state.songNotWhite.reduxLibrarySong);
     const dispatch = useDispatch();
-    const reduxIsLogin = useSelector((state) => state.auth.reduxIsLogin);
-
-    // Fetch playlists on mount
-    useEffect(() => {
-        if (!reduxIsLogin) return;
-        const loadPlaylists = async () => {
-            try {
-                const playlistData = await getMyPlaylists();
-                setPlaylists(playlistData);
-            } catch (err) {
-                console.error('Failed to fetch playlists:', err);
-            }
-        };
-        loadPlaylists();
-    }, [reduxIsLogin]);
 
     // Handle body overflow when menu is open
     useEffect(() => {
@@ -124,7 +107,7 @@ const LibrarySong = () => {
     return (
         <div className="library-song-container">
             <Notification key={notificationKey} message={notificationData} setNotificationData={setNotificationData} />
-            {menuPosition && <ContextMenu position={menuPosition} reduxData={reduxLibrarySong} playlists={playlists} onClose={handleCloseMenu} onNotification={showNotification} />}
+            {menuPosition && <ContextMenu position={menuPosition} reduxData={reduxLibrarySong} onClose={handleCloseMenu} onNotification={showNotification} />}
         </div>
     );
 };

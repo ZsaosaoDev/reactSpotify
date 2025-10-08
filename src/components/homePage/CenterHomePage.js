@@ -8,6 +8,7 @@ import Slider from '~/components/slider/Slider';
 import { getAlbumWithSongs, getArtistWithSongs, getListeningHistory, getSongAndArtistBySongId, getTrendingAlbums, getTrendingArtists, getTrendingSongs } from '~/apis/songApi';
 import { setReduxIsPlaying, setReduxIsRight, setReduxLibrarySong } from '~/redux/reducer/songNotWhitelistSlice';
 import { addNextSong, addSongList, clearSongs, setReduxCurrentSongIndex } from '~/redux/reducer/songSlice';
+import NoAvatar from '~/assets/image/noAvatar.png';
 import AlbumView from '~/components/listSong/AlbumView';
 import ArtistSongList from '~/components/listSong/ArtistSongList';
 import './CenterHomePage.sass';
@@ -249,7 +250,7 @@ const CenterHomePage = () => {
                                             ]);
                                         }}>
                                         <div className="trendingSongImage">
-                                            <img src={song.imageUrl} alt={song.title} />
+                                            <img src={song.imageUrl || NoAvatar} alt={song.title} />
                                         </div>
                                         <div className="trendingSongTitle">{song.title}</div>
                                         <p className="trendingSongArtist">{song.artistName || 'No name'}</p>

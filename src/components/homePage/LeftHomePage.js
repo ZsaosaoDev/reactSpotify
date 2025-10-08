@@ -1,8 +1,10 @@
-import { IconSearch, IconList, IconClose } from '~/assets/image/icons';
-import './LeftHomePage.sass';
 import { useSelector } from 'react-redux';
 import { useEffect, useState, useCallback } from 'react';
+
+import { IconSearch, IconList, IconClose } from '~/assets/image/icons';
+import NoAvatar from '~/assets/image/noAvatar.png';
 import { followed } from '~/apis/songApi';
+import './LeftHomePage.sass';
 
 const LeftHomePage = () => {
     const reduxRefresh = useSelector((state) => state.songNotWhite.reduxRefresh);
@@ -101,7 +103,7 @@ const LeftHomePage = () => {
                                     {filteredPlaylists.map((playlist) => (
                                         <div key={`playlist-${playlist.id}`} className="followedItem">
                                             <div className="itemImage">
-                                                <img src={playlist.imageUrl} alt={playlist.name} />
+                                                <img src={playlist.imageUrl || NoAvatar} alt={playlist.name} />
                                             </div>
                                             <div className="itemInfo">
                                                 <div className="itemName">{playlist.name}</div>
@@ -123,7 +125,7 @@ const LeftHomePage = () => {
                                     {filteredArtists.map((artist) => (
                                         <div key={`artist-${artist.id}`} className="followedItem">
                                             <div className="itemImage artistImage">
-                                                <img src={artist.urlAvatar} alt={artist.userName || 'Artist'} />
+                                                <img src={artist.urlAvatar || NoAvatar} alt={artist.userName || 'Artist'} />
                                             </div>
                                             <div className="itemInfo">
                                                 <div className="itemName">{artist.userName || 'Unknown Artist'}</div>
@@ -143,7 +145,7 @@ const LeftHomePage = () => {
                                     {filteredAlbums.map((album) => (
                                         <div key={`album-${album.id}`} className="followedItem">
                                             <div className="itemImage">
-                                                <img src={album.coverUrl} alt={album.name} />
+                                                <img src={album.coverUrl || NoAvatar} alt={album.name} />
                                             </div>
                                             <div className="itemInfo">
                                                 <div className="itemName">{album.name}</div>

@@ -3,7 +3,7 @@ import PlaylistPanel from './PlaylistPanel';
 import { useMenuOptions } from './hooks/useMenuOptions';
 import './ContextMenu.sass';
 
-const ContextMenu = ({ position, reduxData, playlists, onClose, onNotification }) => {
+const ContextMenu = ({ position, reduxData, onClose, onNotification }) => {
     const [playlistPanelPosition, setPlaylistPanelPosition] = useState(null);
 
     // Show playlist panel with position calculation
@@ -85,7 +85,7 @@ const ContextMenu = ({ position, reduxData, playlists, onClose, onNotification }
                 ))}
             </div>
 
-            {playlistPanelPosition && <PlaylistPanel position={playlistPanelPosition} playlists={playlists} onClose={onClose} onNotification={onNotification} />}
+            {playlistPanelPosition && <PlaylistPanel position={playlistPanelPosition} onClose={onClose} onNotification={onNotification} />}
         </>
     );
 };
