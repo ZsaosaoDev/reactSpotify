@@ -179,6 +179,24 @@ async function followed() {
     }
 }
 
+async function followedArtistApi() {
+    try {
+        const res = await api.get('user/followedArtist');
+        return res.data;
+    } catch (err) {
+        throw err;
+    }
+}
+
+async function followedAlbumApi() {
+    try {
+        const res = await api.get('user/followedAlbum');
+        return res.data;
+    } catch (err) {
+        throw err;
+    }
+}
+
 export {
     uploadSong,
     getAllSongGenres,
@@ -198,4 +216,6 @@ export {
     getMyPlaylists,
     createPlaylistWithSong,
     followed,
+    followedArtistApi,
+    followedAlbumApi,
 };

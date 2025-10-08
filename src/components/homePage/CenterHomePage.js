@@ -269,7 +269,19 @@ const CenterHomePage = () => {
                             </div>
                             <Slider>
                                 {topAlbums?.map((album) => (
-                                    <div key={album.id} className="albumItem" onClick={() => handleAlbum(album.id)}>
+                                    <div
+                                        key={album.id}
+                                        className="albumItem"
+                                        onClick={() => handleAlbum(album.id)}
+                                        onContextMenu={(e) => {
+                                            handleLibrarySong(e, [
+                                                { type: 'album', id: album.id },
+                                                {
+                                                    type: 'artist',
+                                                    id: album.artistId,
+                                                },
+                                            ]);
+                                        }}>
                                         <div className="albumImage">
                                             <img src={album.coverUrl} alt={album.name} />
                                         </div>
@@ -287,7 +299,19 @@ const CenterHomePage = () => {
                             </div>
                             <Slider>
                                 {topArtists.map((artist) => (
-                                    <div key={artist.id} className="artistItem" onClick={() => navigate(`/artist/${artist.id}`)}>
+                                    <div
+                                        key={artist.id}
+                                        className="artistItem"
+                                        onClick={() => navigate(`/artist/${artist.id}`)}
+                                        onContextMenu={(e) => {
+                                            handleLibrarySong(e, [
+                                                {
+                                                    type: 'artist',
+                                                    id: artist.id,
+                                                },
+                                            ]);
+                                        }}>
+                                        >
                                         <div className="artistImage">
                                             <img src={artist.urlAvatar} alt={artist.username} />
                                         </div>
