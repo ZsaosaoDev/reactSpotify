@@ -1,6 +1,6 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import NoAvatar from '~/assets/image/noAvatar.png';
 import {
@@ -28,6 +28,8 @@ import './Navigation.sass';
 const Navigation = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
+    const searchInputRef = useRef(null);
 
     const isHomeActive = useSelector((state) => state.ui.reduxIsHomeActive);
     const isBrowseActive = useSelector((state) => state.ui.reduxIsBrowseActive);
@@ -39,18 +41,35 @@ const Navigation = () => {
     const [searchValue, setSearchValue] = useState('');
     const [displayIconClose, setDisplayIconClose] = useState(false);
     const [settings, setSetTings] = useState(false);
+    const [lastSearchParams, setLastSearchParams] = useState(null);
+    const [isFirstSearch, setIsFirstSearch] = useState(true);
 
-    // Xử lý thay đổi ô tìm kiếm
+    // Reset thanh tìm kiếm khi chuyển trang (trừ trang search)
+    useEffect(() => {
+        if (!location.pathname.startsWith('/search/')) {
+            setSearchValue('');
+            setDisplayIconClose(false);
+            setIsFirstSearch(true);
+            // Blur input để loại bỏ con trỏ chuột
+            if (searchInputRef.current) {
+                searchInputRef.current.blur();
+            }
+        }
+    }, [location.pathname]);
+
     const handleSearchChange = (e) => {
         const value = e.target.value;
         setSearchValue(value);
         setDisplayIconClose(value.length > 0);
     };
 
-    // Xóa nội dung ô tìm kiếm
     const handleClose = () => {
         setSearchValue('');
         setDisplayIconClose(false);
+        setIsFirstSearch(true);
+        if (searchInputRef.current) {
+            searchInputRef.current.blur();
+        }
     };
 
     // Xử lý đăng xuất
@@ -65,24 +84,31 @@ const Navigation = () => {
             });
     };
 
-    const [lastSearchParams, setLastSearchParams] = useState(null);
+    const hasRole = (role) => {
+        return reduxUser && reduxUser.roles && reduxUser.roles.includes(role);
+    };
+
     const handleSearchSubmit = (e) => {
         if (e.key === 'Enter' && searchValue.trim() !== '') {
             const newSearchParams = encodeURIComponent(searchValue.trim());
 
-            // Nếu search params giống search trước thì bỏ qua
             if (newSearchParams === lastSearchParams) {
                 return;
             }
 
-            // Nếu đã có search trước đó thì replace (search liên tiếp)
-            const shouldReplace = lastSearchParams !== null;
+            // Lần search đầu tiên dùng push, lần sau dùng replace để tránh quay lại search cũ
+            const shouldReplace = !isFirstSearch;
 
             navigate(`/search/${newSearchParams}`, {
                 replace: shouldReplace,
             });
 
             setLastSearchParams(newSearchParams);
+            setIsFirstSearch(false);
+            // Blur input sau khi submit
+            if (searchInputRef.current) {
+                searchInputRef.current.blur();
+            }
         }
     };
 
@@ -105,6 +131,7 @@ const Navigation = () => {
                             </div>
                             <div className="input-search">
                                 <input
+                                    ref={searchInputRef}
                                     type="text"
                                     placeholder="What do you want to play?"
                                     value={searchValue}
@@ -152,13 +179,22 @@ const Navigation = () => {
                     </div>
                     {settings ? (
                         <div className="settings">
-                            <div>Accout</div>
-                            <div>Profile</div>
-                            <div>Upgrade to Premium</div>
-                            <div>Support</div>
-                            <div>Download</div>
-                            <div>Settings</div>
-                            <div onClick={hangdleLogout}>Log out</div>
+                            <div className="setting">Profile</div>
+                            {hasRole('ARTIST') ? (
+                                <div
+                                    className="setting"
+                                    onClick={() => {
+                                        setSetTings(false);
+                                        navigate('/your-music');
+                                    }}>
+                                    Your Music
+                                </div>
+                            ) : (
+                                ''
+                            )}
+                            <div className="setting" onClick={hangdleLogout}>
+                                Log out
+                            </div>
                         </div>
                     ) : (
                         ''
@@ -179,6 +215,7 @@ const Navigation = () => {
                             </div>
                             <div className="input-search">
                                 <input
+                                    ref={searchInputRef}
                                     type="text"
                                     placeholder="What do you want to play?"
                                     value={searchValue}

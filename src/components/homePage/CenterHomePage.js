@@ -20,6 +20,7 @@ import AlbumView from '~/components/listSong/AlbumView';
 import ArtistSongList from '~/components/listSong/ArtistSongList';
 import Playlist from '~/components/listSong/Playlist';
 import SearchView from '~/components/listSong/SearchView';
+import YourMusic from '~/components/listSong/YourMusic';
 import './CenterHomePage.sass';
 
 const CenterHomePage = () => {
@@ -140,10 +141,10 @@ const CenterHomePage = () => {
     useEffect(() => {
         const path = location.pathname;
         const parts = path.split('/').filter(Boolean);
-        if (parts.length === 2) {
-            const [page, id] = parts;
-            setPageType(page);
-            setPageId(id);
+
+        if (parts.length >= 1) {
+            setPageType(parts[0]);
+            setPageId(parts[1] || null);
         } else {
             setPageType(null);
             setPageId(null);
@@ -160,37 +161,33 @@ const CenterHomePage = () => {
     const renderContent = () => {
         switch (pageType) {
             case 'album':
-                return pageId ? (
+                return (
                     <AlbumView
                         albumId={Number(pageId)}
                         onPlayListSong={playListSong}
                         handleLibrarySong={handleLibrarySong}
                     />
-                ) : null;
+                );
             case 'artist':
-                return pageId ? (
+                return (
                     <ArtistSongList
                         artistId={Number(pageId)}
                         onPlayListSong={playListSong}
                         handleLibrarySong={handleLibrarySong}
                     />
-                ) : null;
+                );
             case 'playlist':
-                return pageId ? (
+                return (
                     <Playlist
                         playlistId={Number(pageId)}
                         onPlayListSong={playListSong}
                         handleLibrarySong={handleLibrarySong}
                     />
-                ) : null;
+                );
             case 'search':
-                return pageId ? (
-                    <SearchView
-                        onPlayListSong={playListSong}
-                        handleLibrarySong={handleLibrarySong}
-                        listenSong={listenSong}
-                    />
-                ) : null;
+                return <SearchView listenSong={listenSong} />;
+            case 'your-music':
+                return <YourMusic listenSong={listenSong} />;
             default:
                 return (
                     <>

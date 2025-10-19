@@ -224,6 +224,24 @@ async function searchSongs(keyword) {
     }
 }
 
+async function deletePlaylist(playlistId) {
+    try {
+        const res = await api.delete(`/user/${playlistId}`);
+        return res.data;
+    } catch (err) {
+        throw err;
+    }
+}
+
+async function getMySongs() {
+    try {
+        const res = await api.get('/artist/get-songs');
+        return res.data;
+    } catch (err) {
+        throw err;
+    }
+}
+
 export {
     uploadSong,
     getAllSongGenres,
@@ -248,4 +266,6 @@ export {
     getPlaylistWithListSong,
     getRecommendSongs,
     searchSongs,
+    deletePlaylist,
+    getMySongs,
 };

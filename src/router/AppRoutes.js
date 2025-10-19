@@ -13,6 +13,7 @@ const pages = {
     '/artist/*': HomePage,
     '/playlist/*': HomePage,
     '/search/*': HomePage,
+    '/your-music/*': HomePage,
     '/signUpInitiatePage': SignUpInitiatePage,
     '/signUpVerifyPage': SignUpVerifyPage,
     '/loginPage': LoginPage,
@@ -23,7 +24,7 @@ const pages = {
 // Hàm helper để lấy animation key
 const getAnimationKey = (pathname = '') => {
     // Các nhóm route dùng chung animation 'home'
-    const sharedRoutes = ['/', '/album', '/artist', '/playlist', '/search'];
+    const sharedRoutes = ['/', '/album', '/artist', '/playlist', '/search', '/your-music'];
 
     // Nếu pathname trùng hoặc bắt đầu bằng 1 trong các route chung
     if (sharedRoutes.some((route) => pathname === route || pathname.startsWith(route + '/'))) {

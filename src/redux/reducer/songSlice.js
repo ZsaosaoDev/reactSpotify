@@ -28,7 +28,6 @@ const songSlice = createSlice({
             state.reduxListSong.push(action.payload);
         },
 
-        // Cập nhật bài đang phát
         setReduxCurrentSongIndex: (state, action) => {
             const listLength = state.reduxListSong.length;
 
@@ -71,5 +70,16 @@ const songSlice = createSlice({
     },
 });
 
-export const { addNextSong, addSongToEnd, setReduxCurrentSongIndex, removeSong, clearSongs, setReduxIsRight, setReduxCurrentTime, setReduxIsPlaying, addSongList, setReduxVolume } = songSlice.actions;
+export const {
+    addNextSong,
+    addSongToEnd,
+    setReduxCurrentSongIndex,
+    removeSong,
+    clearSongs,
+    setReduxIsRight,
+    setReduxCurrentTime,
+    setReduxIsPlaying,
+    addSongList,
+    setReduxVolume,
+} = songSlice.actions;
 export default songSlice.reducer;

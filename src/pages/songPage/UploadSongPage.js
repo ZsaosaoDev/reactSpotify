@@ -17,6 +17,8 @@ const UploadSongPage = () => {
     const [genreIds, setGenreIds] = useState([]);
     const [genres, setGenres] = useState([]);
 
+    const [errorTitle, setErrorTitle] = useState('');
+    const [errorAuthor, setErrorAuthor] = useState('');
     const [status, setStatus] = useState('idle'); // idle | loading | success | error
 
     const [dragOverMedia, setDragOverMedia] = useState(false);
@@ -25,7 +27,6 @@ const UploadSongPage = () => {
     const processMediaFile = (file) => {
         if (!file) return;
         if (!file.type.startsWith('audio/') && !file.type.startsWith('video/')) return;
-
         setFileMedia(file);
         const url = URL.createObjectURL(file);
         setMediaPreview(url);
@@ -35,7 +36,6 @@ const UploadSongPage = () => {
     const processImageFile = (file) => {
         if (!file) return;
         if (!file.type.startsWith('image/')) return;
-
         setFileImage(file);
         setImagePreview(URL.createObjectURL(file));
     };
@@ -75,7 +75,25 @@ const UploadSongPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        let hasError = false;
+        setErrorTitle('');
+        setErrorAuthor('');
+
+        if (!title.trim()) {
+            setErrorTitle('Vui lòng nhập tiêu đề bài hát.');
+            hasError = true;
+        }
+        if (!author.trim()) {
+            setErrorAuthor('Vui lòng nhập tên tác giả.');
+            hasError = true;
+        }
         if (!fileMedia) {
+            setStatus('error');
+            setTimeout(() => setStatus('idle'), 3000);
+            return;
+        }
+        if (hasError) {
             setStatus('error');
             setTimeout(() => setStatus('idle'), 3000);
             return;
@@ -157,17 +175,29 @@ const UploadSongPage = () => {
                                         onDragLeave={handleMediaDragLeave}>
                                         {mediaPreview ? (
                                             isVideo ? (
-                                                <video src={mediaPreview} controls onClick={(e) => e.stopPropagation()} />
+                                                <video
+                                                    src={mediaPreview}
+                                                    controls
+                                                    onClick={(e) => e.stopPropagation()}
+                                                />
                                             ) : (
                                                 <audio controls onClick={(e) => e.stopPropagation()}>
                                                     <source src={mediaPreview} type={fileMedia?.type} />
                                                 </audio>
                                             )
                                         ) : (
-                                            <div className="placeholder">Click hoặc kéo thả file audio/video vào đây</div>
+                                            <div className="placeholder">
+                                                Click hoặc kéo thả file audio/video vào đây
+                                            </div>
                                         )}
                                     </div>
-                                    <input id="media-input" type="file" accept="audio/*,video/*" onChange={handleMediaChange} hidden />
+                                    <input
+                                        id="media-input"
+                                        type="file"
+                                        accept="audio/*,video/*"
+                                        onChange={handleMediaChange}
+                                        hidden
+                                    />
                                     <div
                                         className={`image-box ${dragOverImage ? 'drag-over' : ''}`}
                                         onClick={handleImageClick}
@@ -176,36 +206,71 @@ const UploadSongPage = () => {
                                         onDragEnter={handleImageDragEnter}
                                         onDragLeave={handleImageDragLeave}>
                                         {imagePreview ? (
-                                            <img src={imagePreview} alt="Cover preview" onClick={(e) => e.stopPropagation()} />
+                                            <img
+                                                src={imagePreview}
+                                                alt="Cover preview"
+                                                onClick={(e) => e.stopPropagation()}
+                                            />
                                         ) : (
                                             <div className="placeholder">Click hoặc kéo thả ảnh bìa vào đây</div>
                                         )}
                                     </div>
-                                    <input id="image-input" type="file" accept="image/*" onChange={handleImageChange} hidden />
+                                    <input
+                                        id="image-input"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageChange}
+                                        hidden
+                                    />
                                 </div>
 
                                 <div className="right">
                                     <div className="field">
                                         <label>Title</label>
-                                        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+                                        <input
+                                            type="text"
+                                            value={title}
+                                            onChange={(e) => {
+                                                setTitle(e.target.value);
+                                                if (e.target.value.trim()) setErrorTitle('');
+                                            }}
+                                            className={errorTitle ? 'error' : ''}
+                                        />
+                                        {errorTitle && <p className="error-text">{errorTitle}</p>}
                                     </div>
+
                                     <div className="field">
                                         <label>Author</label>
-                                        <input type="text" value={author} onChange={(e) => setAuthor(e.target.value)} />
+                                        <input
+                                            type="text"
+                                            value={author}
+                                            onChange={(e) => {
+                                                setAuthor(e.target.value);
+                                                if (e.target.value.trim()) setErrorAuthor('');
+                                            }}
+                                            className={errorAuthor ? 'error' : ''}
+                                        />
+                                        {errorAuthor && <p className="error-text">{errorAuthor}</p>}
                                     </div>
 
                                     <label>Genre</label>
                                     <div className="multi-select">
                                         <div className="options">
                                             {genres.map((g) => (
-                                                <div key={g.id} className={`option ${genreIds.includes(g.id) ? 'active' : ''}`} onClick={() => toggleSelect(g.id)}>
+                                                <div
+                                                    key={g.id}
+                                                    className={`option ${genreIds.includes(g.id) ? 'active' : ''}`}
+                                                    onClick={() => toggleSelect(g.id)}>
                                                     {g.name}
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
 
-                                    <button type="submit" className={`btn submit-btn ${status}`} disabled={status === 'loading'}>
+                                    <button
+                                        type="submit"
+                                        className={`btn submit-btn ${status}`}
+                                        disabled={status === 'loading'}>
                                         <span>
                                             {status === 'idle' && 'Upload Song'}
                                             {status === 'loading' && 'Uploading...'}

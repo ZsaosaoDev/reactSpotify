@@ -41,15 +41,6 @@ const LibrarySong = () => {
                 console.log('No items selected, not opening menu');
                 return;
             }
-
-            // Validate all items have valid type
-            const hasInvalidType = reduxLibrarySong.some((item) => !item.type || !['playlist', 'artist', 'album'].includes(item.type));
-
-            if (hasInvalidType) {
-                console.log('Invalid type detected, not opening menu');
-                return;
-            }
-
             if (menuPosition) {
                 console.log('Menu already open, closing it');
                 handleCloseMenu();
@@ -107,7 +98,14 @@ const LibrarySong = () => {
     return (
         <div className="library-song-container">
             <Notification key={notificationKey} message={notificationData} setNotificationData={setNotificationData} />
-            {menuPosition && <ContextMenu position={menuPosition} reduxData={reduxLibrarySong} onClose={handleCloseMenu} onNotification={showNotification} />}
+            {menuPosition && (
+                <ContextMenu
+                    position={menuPosition}
+                    reduxData={reduxLibrarySong}
+                    onClose={handleCloseMenu}
+                    onNotification={showNotification}
+                />
+            )}
         </div>
     );
 };

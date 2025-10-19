@@ -1,13 +1,15 @@
-import { useSelector } from 'react-redux';
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { IconSearch, IconList, IconClose } from '~/assets/image/icons';
 import NoAvatar from '~/assets/image/noAvatar.png';
 import { followed } from '~/apis/songApi';
 import './LeftHomePage.sass';
+import { setReduxLibrarySong } from '~/redux/reducer/songNotWhitelistSlice';
 
 const LeftHomePage = () => {
+    const dispatch = useDispatch();
     const reduxRefresh = useSelector((state) => state.songNotWhite.reduxRefresh);
     const [followedData, setFollowedData] = useState({
         artistFollowed: [],
@@ -34,7 +36,6 @@ const LeftHomePage = () => {
         fetchFollowed();
     }, [reduxRefresh, fetchFollowed]);
 
-    // ✅ Search filtering
     const filterBySearch = (items, type) => {
         if (!searchQuery) return items;
         return items.filter((item) => {
@@ -42,6 +43,12 @@ const LeftHomePage = () => {
                 type === 'artist' ? (item.userName || 'Unknown Artist').toLowerCase() : (item.name || '').toLowerCase();
             return searchText.includes(searchQuery.toLowerCase());
         });
+    };
+
+    const handleLibrarySong = (e, payload) => {
+        e.preventDefault();
+        console.log('Library song context menu payload:', payload);
+        dispatch(setReduxLibrarySong(payload));
     };
 
     const filteredPlaylists =
@@ -61,9 +68,6 @@ const LeftHomePage = () => {
             <div className="leftHeader">
                 <div className="titleShrink">
                     <div className="title">Your Library</div>
-                </div>
-                <div className="actions">
-                    <div className="createBtn">+ Create</div>
                 </div>
             </div>
 
@@ -121,7 +125,10 @@ const LeftHomePage = () => {
                                         <div
                                             key={`playlist-${playlist.id}`}
                                             className="followedItem"
-                                            onClick={() => navigate(`/playlist/${playlist.id}`)}>
+                                            onClick={() => navigate(`/playlist/${playlist.id}`)}
+                                            onContextMenu={(e) => {
+                                                handleLibrarySong(e, [{ type: 'delePlaylist', id: playlist.id }]);
+                                            }}>
                                             <div className="itemImage">
                                                 <img src={playlist.imageUrl || NoAvatar} alt={playlist.name} />
                                             </div>
@@ -147,7 +154,10 @@ const LeftHomePage = () => {
                                         <div
                                             key={`artist-${artist.id}`}
                                             className="followedItem"
-                                            onClick={() => navigate(`/artist/${artist.id}`)}>
+                                            onClick={() => navigate(`/artist/${artist.id}`)}
+                                            onContextMenu={(e) => {
+                                                handleLibrarySong(e, [{ type: 'artist', id: artist.id }]);
+                                            }}>
                                             <div className="itemImage artistImage">
                                                 <img
                                                     src={artist.urlAvatar || NoAvatar}
@@ -173,7 +183,10 @@ const LeftHomePage = () => {
                                         <div
                                             key={`album-${album.id}`}
                                             className="followedItem"
-                                            onClick={() => navigate(`/album/${album.id}`)}>
+                                            onClick={() => navigate(`/album/${album.id}`)}
+                                            onContextMenu={(e) => {
+                                                handleLibrarySong(e, [{ type: 'album', id: album.id }]);
+                                            }}>
                                             <div className="itemImage">
                                                 <img src={album.coverUrl || NoAvatar} alt={album.name} />
                                             </div>

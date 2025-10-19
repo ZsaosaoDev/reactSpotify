@@ -10,7 +10,7 @@ import { setReduxLibrarySong } from '~/redux/reducer/songNotWhitelistSlice';
 import { searchSongs } from '~/apis/songApi';
 import './SearchView.sass';
 
-const SearchView = ({ onPlayListSong, handleLibrarySong, listenSong }) => {
+const SearchView = ({ listenSong }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();

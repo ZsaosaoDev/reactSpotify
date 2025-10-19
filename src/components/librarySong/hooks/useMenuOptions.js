@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { follow, unfollow, followedArtistApi, followedAlbumApi } from '~/apis/songApi';
+import { follow, unfollow, followedArtistApi, followedAlbumApi, deletePlaylist } from '~/apis/songApi';
 import { IconClose, IconFollow, IconPlusCircle, IconTriangle } from '~/assets/image/icons';
 import { setReduxRefresh } from '~/redux/reducer/songNotWhitelistSlice';
 
@@ -12,7 +12,6 @@ export const useMenuOptions = (reduxData, onNotification) => {
 
     const reduxLibrarySong = useSelector((state) => state.songNotWhite.reduxLibrarySong);
 
-    // Kiểm tra xem reduxData có chứa type nào không
     const hasArtist = useMemo(() => reduxData?.some((item) => item.type === 'artist'), [reduxData]);
     const hasAlbum = useMemo(() => reduxData?.some((item) => item.type === 'album'), [reduxData]);
 
@@ -35,7 +34,6 @@ export const useMenuOptions = (reduxData, onNotification) => {
                 if (hasAlbum) {
                     promises.push(
                         followedAlbumApi().then((albums) => {
-                            console.log(albums);
                             setFollowedAlbums(albums || []);
                         })
                     );
@@ -59,7 +57,6 @@ export const useMenuOptions = (reduxData, onNotification) => {
             return [];
         }
 
-        // Chỉ check null cho type cần thiết
         if ((hasArtist && followedArtists === null) || (hasAlbum && followedAlbums === null)) {
             return [];
         }
@@ -89,10 +86,43 @@ export const useMenuOptions = (reduxData, onNotification) => {
                         isPlaylistAction: true,
                     });
                     break;
+                case 'delePlaylist':
+                    options.push({
+                        label: (
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    width: '100%',
+                                }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <>
+                                        <IconClose height={16} />
+                                        Delete Playlist
+                                    </>
+                                </div>
+                            </div>
+                        ),
+                        action: async () => {
+                            for (const item of reduxLibrarySong) {
+                                if (item.type === 'delePlaylist') {
+                                    try {
+                                        const res = await deletePlaylist(item.id);
+                                        dispatch(setReduxRefresh());
+                                        onNotification(res?.message || 'Deleted playlist successfully');
+                                    } catch (e) {
+                                        onNotification('Failed to delete playlist or please login first');
+                                    }
+                                }
+                            }
+                        },
+                        isPlaylistAction: false,
+                    });
+                    break;
 
                 case 'artist':
                     const isFollowed = followedArtists.some((artist) => artist.id === id);
-
                     options.push({
                         label: (
                             <div
