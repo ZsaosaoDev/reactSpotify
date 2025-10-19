@@ -215,6 +215,15 @@ async function getRecommendSongs() {
     }
 }
 
+async function searchSongs(keyword) {
+    try {
+        const res = await api.get(`/search?keyword=${encodeURIComponent(keyword)}`);
+        return res.data;
+    } catch (err) {
+        throw err;
+    }
+}
+
 export {
     uploadSong,
     getAllSongGenres,
@@ -238,4 +247,5 @@ export {
     followedAlbumApi,
     getPlaylistWithListSong,
     getRecommendSongs,
+    searchSongs,
 };

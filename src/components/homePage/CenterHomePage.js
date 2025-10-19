@@ -19,6 +19,7 @@ import NoAvatar from '~/assets/image/noAvatar.png';
 import AlbumView from '~/components/listSong/AlbumView';
 import ArtistSongList from '~/components/listSong/ArtistSongList';
 import Playlist from '~/components/listSong/Playlist';
+import SearchView from '~/components/listSong/SearchView';
 import './CenterHomePage.sass';
 
 const CenterHomePage = () => {
@@ -51,7 +52,6 @@ const CenterHomePage = () => {
                 setTrendingSongs(songs);
                 setTopAlbums(albums);
                 setTopArtists(artists);
-                console.log(recommend);
                 setRecommendSongs(recommend);
             } catch (err) {
                 console.error('Failed to fetch trending data:', err);
@@ -85,12 +85,16 @@ const CenterHomePage = () => {
             try {
                 const res = await getSongAndArtistBySongId(songId);
                 dispatch(addNextSong(res));
-
                 dispatch(setReduxCurrentSongIndex(0));
                 dispatch(setReduxIsRight(true));
                 dispatch(setReduxIsPlaying(true));
 
+                // Cập nhật lịch sử nghe
                 await updateHistory();
+
+                // 🔁 Cập nhật lại danh sách đề xuất sau khi nghe bài hát
+                const newRecommend = await getRecommendSongs();
+                setRecommendSongs(newRecommend);
             } catch (err) {
                 console.error('Error playing song:', err);
             }
@@ -177,6 +181,14 @@ const CenterHomePage = () => {
                         playlistId={Number(pageId)}
                         onPlayListSong={playListSong}
                         handleLibrarySong={handleLibrarySong}
+                    />
+                ) : null;
+            case 'search':
+                return pageId ? (
+                    <SearchView
+                        onPlayListSong={playListSong}
+                        handleLibrarySong={handleLibrarySong}
+                        listenSong={listenSong}
                     />
                 ) : null;
             default:

@@ -91,18 +91,11 @@ const ArtistSongList = ({ artistId, onPlayListSong, handleLibrarySong }) => {
                     ]);
                 }}>
                 <div className="artistPicture">
-                    {selectedAlbum?.coverUrl ? (
-                        <img src={selectedAlbum.coverUrl || NoAvatar} alt={selectedAlbum.name} />
-                    ) : (
-                        <div style={{ width: '100%', height: '100%', background: '#333' }}>No Image</div>
-                    )}
+                    <img src={artist?.urlAvatar || NoAvatar} alt={artist?.urlAvatar} />
                 </div>
                 <div className="artistInfo">
                     <div className="artistTitle">{selectedAlbum?.name || 'No Album'}</div>
                     <div className="artistDetails">
-                        {artist?.urlAvatar && (
-                            <img className="artistUserAvatar" src={artist.urlAvatar || NoAvatar} alt="Artist" />
-                        )}
                         <div className="artistUserName">{artist?.username || artist?.email || 'No name'}</div>
                         <div className="artistSongCount">{displayedSongs.length} song(s)</div>
                         <div className="artistTotalTime">{calculateTotalTime(displayedSongs)}</div>
