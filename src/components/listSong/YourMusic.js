@@ -5,9 +5,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
 
 import NoAvatar from '~/assets/image/noAvatar.png';
-import Slider from '~/components/slider/Slider';
 import { setReduxLibrarySong } from '~/redux/reducer/songNotWhitelistSlice';
-import { getMySongs } from '~/apis/songApi';
+import { getMySongs, getMyAlbums, createAlbum } from '~/apis/songApi';
+import CreatePopup from '~/components/popup/CreatePopup';
 import './YourMusic.sass';
 
 const YourMusic = ({ listenSong }) => {
@@ -15,7 +15,9 @@ const YourMusic = ({ listenSong }) => {
     const navigate = useNavigate();
 
     const [songs, setSongs] = useState([]);
+    const [albums, setAlbums] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [showPopup, setShowPopup] = useState(false);
 
     const handlePlay = (e, song) => {
         e.stopPropagation();
@@ -28,57 +30,108 @@ const YourMusic = ({ listenSong }) => {
     };
 
     useEffect(() => {
-        const fetchSongs = async () => {
+        const fetchData = async () => {
             setIsLoading(true);
             try {
-                const res = await getMySongs();
-                setSongs(res || []);
+                const [songsRes, albumsRes] = await Promise.all([getMySongs(), getMyAlbums()]);
+                setSongs(songsRes || []);
+                setAlbums(albumsRes || []);
             } catch (err) {
-                console.error('Failed to load songs:', err);
+                console.error('Failed to load music:', err);
                 setSongs([]);
+                setAlbums([]);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchSongs();
+        fetchData();
     }, []);
 
+    const handleCreateAlbum = async (data) => {
+        const formData = new FormData();
+        formData.append('name', data.name);
+        formData.append('description', data.description);
+        formData.append('fileCover', data.coverFile);
+        await createAlbum(formData);
+
+        const albumsRes = await getMyAlbums();
+        setAlbums(albumsRes || []);
+    };
+
     if (isLoading) return <div className="yourMusicContainer">Loading...</div>;
-    if (songs.length === 0) return <div className="yourMusicContainer">You have no songs yet.</div>;
 
     return (
         <div className="yourMusicContainer">
+            {/* --- SONGS SECTION --- */}
             <div className="header">
                 <h2 className="yourMusicHeader">Your Songs</h2>
                 <button className="uploadButton" onClick={() => navigate('/song/upload')}>
                     Upload New Song
                 </button>
             </div>
-            <div className="yourMusicSection">
-                {songs.map((song) => (
-                    <div
-                        key={song.id}
-                        className="yourMusicCard"
-                        onContextMenu={(e) =>
-                            handleContext(e, [
-                                // { type: 'playlist', id: song.id },
-                                // { type: 'artist', id: song.artistId },
-                            ])
-                        }>
-                        <div className="yourMusicImage">
-                            <img src={song.imageUrl || NoAvatar} alt={song.title} />
+
+            {songs.length === 0 ? (
+                <div className="yourMusicSection empty">You have no songs yet.</div>
+            ) : (
+                <div className="yourMusicSection">
+                    {songs.map((song) => (
+                        <div
+                            key={song.id}
+                            className="yourMusicCard"
+                            onContextMenu={(e) =>
+                                handleContext(e, [
+                                    // { type: 'playlist', id: song.id },
+                                ])
+                            }>
+                            <div className="yourMusicImage">
+                                <img src={song.imageUrl || NoAvatar} alt={song.title} />
+                            </div>
+                            <div className="yourMusicTitle">{song.title}</div>
+                            <div className="yourMusicArtist" onClick={() => navigate(`/artist/${song.artistId}`)}>
+                                {song.artistName || 'Unknown Artist'}
+                            </div>
+                            <div className="yourMusicPlayButton" onClick={(e) => handlePlay(e, song)}>
+                                <FontAwesomeIcon icon={faPlay} />
+                            </div>
                         </div>
-                        <div className="yourMusicTitle">{song.title}</div>
-                        <div className="yourMusicArtist" onClick={() => navigate(`/artist/${song.artistId}`)}>
-                            {song.artistName || 'Unknown Artist'}
-                        </div>
-                        <div className="yourMusicPlayButton" onClick={(e) => handlePlay(e, song)}>
-                            <FontAwesomeIcon icon={faPlay} />
-                        </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
+            )}
+
+            {/* --- ALBUMS SECTION --- */}
+            <div className="header" style={{ marginTop: '40px' }}>
+                <h2 className="yourMusicHeader">Your Albums</h2>
+                <button className="uploadButton" onClick={() => setShowPopup(true)}>
+                    Create New Album
+                </button>
             </div>
+
+            {albums.length === 0 ? (
+                <div className="yourMusicSection empty">You have no albums yet.</div>
+            ) : (
+                <div className="yourMusicSection">
+                    {albums.map((album) => (
+                        <div key={album.id} className="yourMusicCard" onClick={() => navigate(`/album/${album.id}`)}>
+                            <div className="yourMusicImage">
+                                <img src={album.coverUrl || NoAvatar} alt={album.name} />
+                            </div>
+                            <div className="yourMusicTitle">{album.name}</div>
+                            <div className="yourMusicArtist">{album.description || 'No description'}</div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* --- POPUP TẠO ALBUM --- */}
+            {showPopup && (
+                <CreatePopup
+                    type="album"
+                    mess="Add new alum"
+                    onClose={() => setShowPopup(false)}
+                    onSubmit={handleCreateAlbum}
+                />
+            )}
         </div>
     );
 };

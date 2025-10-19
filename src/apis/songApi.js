@@ -242,6 +242,28 @@ async function getMySongs() {
     }
 }
 
+async function getMyAlbums() {
+    try {
+        const res = await api.get('/artist/get-my-albums');
+        return res.data;
+    } catch (err) {
+        throw err;
+    }
+}
+
+async function createAlbum(formData) {
+    try {
+        const res = await api.post('/artist/create-album', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return res.data;
+    } catch (err) {
+        throw err;
+    }
+}
+
 export {
     uploadSong,
     getAllSongGenres,
@@ -268,4 +290,6 @@ export {
     searchSongs,
     deletePlaylist,
     getMySongs,
+    getMyAlbums,
+    createAlbum,
 };
