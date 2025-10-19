@@ -3,16 +3,17 @@ import { faPlay } from '@fortawesome/free-solid-svg-icons';
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { getAlbumWithSongs } from '~/apis/songApi';
+import { getPlaylistWithListSong } from '~/apis/songApi';
 import { calculateTotalTime, formatDuration } from '~/util/timeUtils';
 import { setReduxIsRight } from '~/redux/reducer/songNotWhitelistSlice';
 import ControlListSong from '~/components/control/ControlListSong';
-import './AlbumView.sass';
+import NoAvatar from '~/assets/image/noAvatar.png';
+import './PlaylistView.sass';
 
-const AlbumView = ({ albumId, onPlayListSong, handleLibrarySong }) => {
+const PlaylistView = ({ playlistId, onPlayListSong, handleLibrarySong }) => {
     const dispatch = useDispatch();
     const [hoverIndex, setHoverIndex] = useState(null);
-    const [albumData, setAlbumData] = useState(null);
+    const [playlistData, setPlaylistData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const currentIndex = useSelector((state) => state.song.reduxCurrentSongIndex);
@@ -20,39 +21,38 @@ const AlbumView = ({ albumId, onPlayListSong, handleLibrarySong }) => {
     const currentSongId = reduxListSong[currentIndex]?.song.id;
     const isPlaying = useSelector((state) => state.songNotWhite.reduxIsPlaying);
 
-    // ================== FETCH ALBUM DATA ==================
+    // ================== FETCH PLAYLIST DATA ==================
     useEffect(() => {
-        const fetchAlbumData = async () => {
-            if (!albumId) return;
+        const fetchPlaylistData = async () => {
+            if (!playlistId) {
+                console.warn('playlistId is missing, skipping API call');
+                return;
+            }
 
             setIsLoading(true);
             try {
-                const data = await getAlbumWithSongs(albumId);
-                setAlbumData(data);
+                const data = await getPlaylistWithListSong(playlistId);
+                console.log('Playlist data:', data);
+                setPlaylistData(data);
                 dispatch(setReduxIsRight(false));
             } catch (err) {
-                console.error('Error fetching album data:', err);
-                setAlbumData(null);
+                console.error('Error fetching playlist data:', err.response || err.message);
+                setPlaylistData(null);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchAlbumData();
-    }, [albumId, dispatch]);
+        fetchPlaylistData();
+    }, [playlistId, dispatch]);
 
     // ================== HANDLERS ==================
-    const handleMouseEnter = (index) => {
-        setHoverIndex(index);
-    };
-
-    const handleMouseLeave = () => {
-        setHoverIndex(null);
-    };
+    const handleMouseEnter = (index) => setHoverIndex(index);
+    const handleMouseLeave = () => setHoverIndex(null);
 
     const handlePlaySong = (e, songId) => {
-        if (!albumData) return;
-        onPlayListSong(e, songId, albumData);
+        if (!playlistData) return;
+        onPlayListSong(e, songId, playlistData);
     };
 
     const renderPlayButton = (song, index) => {
@@ -71,47 +71,35 @@ const AlbumView = ({ albumId, onPlayListSong, handleLibrarySong }) => {
         return index + 1;
     };
 
+    // ================== UI ==================
     if (isLoading) {
-        return <div className="albumContainer">Loading...</div>;
+        return <div className="playlistContainer">Loading...</div>;
     }
 
-    if (!albumData) {
-        return <div className="albumContainer">Album not found</div>;
+    if (!playlistData) {
+        return <div className="playlistContainer">Playlist not found</div>;
     }
 
-    const { album, artist, songs } = albumData;
+    const { playlist, songs } = playlistData;
 
     return (
-        <div className="albumContainer">
-            <div
-                className="albumHeader"
-                onContextMenu={(e) => {
-                    handleLibrarySong(e, [
-                        {
-                            type: 'album',
-                            id: albumId,
-                        },
-                        {
-                            type: 'artist',
-                            id: artist.id,
-                        },
-                    ]);
-                }}>
-                <div className="albumPicture">
-                    <img src={album.coverUrl} alt={album.name} />
+        <div className="playlistContainer">
+            {/* ====== Header ====== */}
+            <div className="playlistHeader">
+                <div className="playlistPicture">
+                    <img src={playlist.imageUrl || NoAvatar} alt={playlist.name} />
                 </div>
-                <div className="albumInfo">
-                    <div className="albumTitle">{album.name}</div>
-                    <div className="albumDetails">
-                        <img className="albumUserAvatar" src={artist.urlAvatar} alt={artist?.username || 'Artist'} />
-                        <div className="albumUserName">{artist?.username || 'No name'}</div>
-                        <div className="albumSongCount">{songs.length} song(s)</div>
-                        <div className="albumTotalTime">{calculateTotalTime(songs)}</div>
+                <div className="playlistInfo">
+                    <div className="playlistTitle">{playlist.name}</div>
+                    <div className="playlistDetails">
+                        <div className="playlistSongCount">{songs.length} song(s)</div>
+                        <div className="playlistTotalTime">{calculateTotalTime(songs)}</div>
                     </div>
                 </div>
             </div>
 
-            <div className="albumBody">
+            {/* ====== Body ====== */}
+            <div className="playlistBody">
                 <ControlListSong isPlaying={isPlaying} onPlayListSong={handlePlaySong} listSong={songs} />
 
                 <div className="songList">
@@ -122,13 +110,8 @@ const AlbumView = ({ albumId, onPlayListSong, handleLibrarySong }) => {
                             onMouseEnter={() => handleMouseEnter(index)}
                             onMouseLeave={handleMouseLeave}
                             onContextMenu={(e) => {
-                                handleLibrarySong(e, [
-                                    { type: 'playlist', id: song.id },
-                                    {
-                                        type: 'album',
-                                        id: albumId,
-                                    },
-                                ]);
+                                console.log(playlistId);
+                                handleLibrarySong(e, [{ type: 'playlist', id: playlistId }]);
                             }}>
                             <div className="songRow">
                                 <div className="songIndex">
@@ -137,13 +120,11 @@ const AlbumView = ({ albumId, onPlayListSong, handleLibrarySong }) => {
                                     </button>
                                 </div>
                                 <div className="songImage">
-                                    <img src={song.imageUrl} alt={song.title} />
+                                    <img src={song.imageUrl || NoAvatar} alt={song.title} />
                                 </div>
                                 <div className="songInfo">
                                     <div className="songTitle">{song.title}</div>
-                                    <div className="songArtist">
-                                        {song.artistName || artist?.username || 'Unknown Artist'}
-                                    </div>
+                                    <div className="songArtist">{song.author || 'Unknown Artist'}</div>
                                 </div>
                             </div>
                             <div className="songDuration">{formatDuration(song.duration)}</div>
@@ -155,4 +136,4 @@ const AlbumView = ({ albumId, onPlayListSong, handleLibrarySong }) => {
     );
 };
 
-export default AlbumView;
+export default PlaylistView;

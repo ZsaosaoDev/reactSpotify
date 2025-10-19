@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
 import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { IconSearch, IconList, IconClose } from '~/assets/image/icons';
 import NoAvatar from '~/assets/image/noAvatar.png';
@@ -37,19 +38,24 @@ const LeftHomePage = () => {
     const filterBySearch = (items, type) => {
         if (!searchQuery) return items;
         return items.filter((item) => {
-            const searchText = type === 'artist' ? (item.userName || 'Unknown Artist').toLowerCase() : (item.name || '').toLowerCase();
+            const searchText =
+                type === 'artist' ? (item.userName || 'Unknown Artist').toLowerCase() : (item.name || '').toLowerCase();
             return searchText.includes(searchQuery.toLowerCase());
         });
     };
 
-    const filteredPlaylists = (filter === 'all' || filter === 'playlists') && filterBySearch(followedData.playlistFollowed, 'playlist');
+    const filteredPlaylists =
+        (filter === 'all' || filter === 'playlists') && filterBySearch(followedData.playlistFollowed, 'playlist');
 
-    const filteredArtists = (filter === 'all' || filter === 'artists') && filterBySearch(followedData.artistFollowed, 'artist');
+    const filteredArtists =
+        (filter === 'all' || filter === 'artists') && filterBySearch(followedData.artistFollowed, 'artist');
 
-    const filteredAlbums = (filter === 'all' || filter === 'albums') && filterBySearch(followedData.albumFollowed, 'album');
+    const filteredAlbums =
+        (filter === 'all' || filter === 'albums') && filterBySearch(followedData.albumFollowed, 'album');
 
-    const hasResults = (filteredPlaylists?.length || 0) + (filteredArtists?.length || 0) + (filteredAlbums?.length || 0) > 0;
-
+    const hasResults =
+        (filteredPlaylists?.length || 0) + (filteredArtists?.length || 0) + (filteredAlbums?.length || 0) > 0;
+    const navigate = useNavigate();
     return (
         <div className="leftHomePage">
             <div className="leftHeader">
@@ -64,7 +70,10 @@ const LeftHomePage = () => {
             {/* FILTER BUTTONS */}
             <div className="filters">
                 {['playlists', 'artists', 'albums'].map((type) => (
-                    <div key={type} className={`filterItem ${filter === type ? 'active' : ''}`} onClick={() => handleFilterClick(type)}>
+                    <div
+                        key={type}
+                        className={`filterItem ${filter === type ? 'active' : ''}`}
+                        onClick={() => handleFilterClick(type)}>
                         {type.charAt(0).toUpperCase() + type.slice(1)}
                     </div>
                 ))}
@@ -76,7 +85,13 @@ const LeftHomePage = () => {
                     <div className="searchIcon">
                         <IconSearch height={16} />
                     </div>
-                    <input className="searchInput" type="text" placeholder="Search in Your Library" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                    <input
+                        className="searchInput"
+                        type="text"
+                        placeholder="Search in Your Library"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
                     {searchQuery && (
                         <div className="clearSearchBtn" onClick={() => setSearchQuery('')}>
                             <IconClose height={16} />
@@ -92,7 +107,9 @@ const LeftHomePage = () => {
             {/* CONTENT */}
             <div className="followedContent">
                 {!hasResults ? (
-                    <div className="emptyState">{searchQuery ? `No results found for "${searchQuery}"` : 'No items found'}</div>
+                    <div className="emptyState">
+                        {searchQuery ? `No results found for "${searchQuery}"` : 'No items found'}
+                    </div>
                 ) : (
                     <>
                         {/* Playlists */}
@@ -101,14 +118,18 @@ const LeftHomePage = () => {
                                 <div className="sectionTitle">Playlists</div>
                                 <div className="followedList">
                                     {filteredPlaylists.map((playlist) => (
-                                        <div key={`playlist-${playlist.id}`} className="followedItem">
+                                        <div
+                                            key={`playlist-${playlist.id}`}
+                                            className="followedItem"
+                                            onClick={() => navigate(`/playlist/${playlist.id}`)}>
                                             <div className="itemImage">
                                                 <img src={playlist.imageUrl || NoAvatar} alt={playlist.name} />
                                             </div>
                                             <div className="itemInfo">
                                                 <div className="itemName">{playlist.name}</div>
                                                 <div className="itemDetails">
-                                                    Playlist • {playlist.songCount} {playlist.songCount === 1 ? 'song' : 'songs'}
+                                                    Playlist • {playlist.songCount}{' '}
+                                                    {playlist.songCount === 1 ? 'song' : 'songs'}
                                                 </div>
                                             </div>
                                         </div>
@@ -123,9 +144,15 @@ const LeftHomePage = () => {
                                 <div className="sectionTitle">Artists</div>
                                 <div className="followedList">
                                     {filteredArtists.map((artist) => (
-                                        <div key={`artist-${artist.id}`} className="followedItem">
+                                        <div
+                                            key={`artist-${artist.id}`}
+                                            className="followedItem"
+                                            onClick={() => navigate(`/artist/${artist.id}`)}>
                                             <div className="itemImage artistImage">
-                                                <img src={artist.urlAvatar || NoAvatar} alt={artist.userName || 'Artist'} />
+                                                <img
+                                                    src={artist.urlAvatar || NoAvatar}
+                                                    alt={artist.userName || 'Artist'}
+                                                />
                                             </div>
                                             <div className="itemInfo">
                                                 <div className="itemName">{artist.userName || 'Unknown Artist'}</div>
@@ -143,7 +170,10 @@ const LeftHomePage = () => {
                                 <div className="sectionTitle">Albums</div>
                                 <div className="followedList">
                                     {filteredAlbums.map((album) => (
-                                        <div key={`album-${album.id}`} className="followedItem">
+                                        <div
+                                            key={`album-${album.id}`}
+                                            className="followedItem"
+                                            onClick={() => navigate(`/album/${album.id}`)}>
                                             <div className="itemImage">
                                                 <img src={album.coverUrl || NoAvatar} alt={album.name} />
                                             </div>

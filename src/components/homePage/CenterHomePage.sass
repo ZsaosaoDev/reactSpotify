@@ -105,6 +105,11 @@
                 font-size: 20px
                 color: var(--white-lv1)
                 font-weight: 600
+                max-width: 150px
+                text-overflow: ellipsis
+                overflow: hidden
+                white-space: nowrap
+
 
             .trendingSongArtist
                 font-size: 14px
@@ -176,3 +181,59 @@
             font-size: 18px
             font-weight: 600
             margin-top: 10px
+
+    .recommendContainer
+        margin-top: 30px
+
+        .recommendTitle
+            font-size: 24px
+            font-weight: 700
+
+        .recommendSongItem
+            position: relative
+            padding: 10px
+            border-radius: 10px
+
+            .recommendSongImage img
+                height: 150px
+                width: 150px
+                border-radius: 10px
+                object-fit: cover
+
+            &:hover
+                background: var(--black-lv3)
+
+            .recommendSongTitle
+                font-size: 20px
+                color: var(--white-lv1)
+                font-weight: 600
+                max-width: 150px
+                text-overflow: ellipsis
+                overflow: hidden
+                white-space: nowrap
+
+
+            .recommendSongArtist
+                font-size: 14px
+                color: var(--white-lv2)
+
+            .recommendPlayButton
+                position: absolute
+                bottom: 50px
+                right: 10px
+                font-size: 20px
+                background-color: rgb(30, 215, 96)
+                height: 50px
+                width: 50px
+                display: flex
+                align-items: center
+                justify-content: center
+                color: var(--black-lv1)
+                border-radius: 50%
+                transform: translateY(40px)
+                opacity: 0
+                transition: all 0.3s ease
+
+            &:hover .recommendPlayButton
+                transform: translateY(0)
+                opacity: 1

@@ -11,12 +11,14 @@ import {
     getTrendingAlbums,
     getTrendingArtists,
     getTrendingSongs,
+    getRecommendSongs,
 } from '~/apis/songApi';
 import { setReduxIsPlaying, setReduxIsRight, setReduxLibrarySong } from '~/redux/reducer/songNotWhitelistSlice';
 import { addNextSong, addSongList, clearSongs, setReduxCurrentSongIndex } from '~/redux/reducer/songSlice';
 import NoAvatar from '~/assets/image/noAvatar.png';
 import AlbumView from '~/components/listSong/AlbumView';
 import ArtistSongList from '~/components/listSong/ArtistSongList';
+import Playlist from '~/components/listSong/Playlist';
 import './CenterHomePage.sass';
 
 const CenterHomePage = () => {
@@ -32,6 +34,7 @@ const CenterHomePage = () => {
     const [topAlbums, setTopAlbums] = useState([]);
     const [topArtists, setTopArtists] = useState([]);
     const [listeningHistory, setListeningHistory] = useState([]);
+    const [recommendSongs, setRecommendSongs] = useState([]);
     const [pageType, setPageType] = useState(null);
     const [pageId, setPageId] = useState(null);
 
@@ -39,14 +42,17 @@ const CenterHomePage = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [songs, albums, artists] = await Promise.all([
+                const [songs, albums, artists, recommend] = await Promise.all([
                     getTrendingSongs(),
                     getTrendingAlbums(),
                     getTrendingArtists(),
+                    getRecommendSongs(),
                 ]);
                 setTrendingSongs(songs);
                 setTopAlbums(albums);
                 setTopArtists(artists);
+                console.log(recommend);
+                setRecommendSongs(recommend);
             } catch (err) {
                 console.error('Failed to fetch trending data:', err);
             }
@@ -97,7 +103,6 @@ const CenterHomePage = () => {
         return data.songs.map((song) => ({
             song: {
                 ...song,
-                artist: data.artist.username,
             },
             artist: data.artist,
         }));
@@ -166,6 +171,14 @@ const CenterHomePage = () => {
                         handleLibrarySong={handleLibrarySong}
                     />
                 ) : null;
+            case 'playlist':
+                return pageId ? (
+                    <Playlist
+                        playlistId={Number(pageId)}
+                        onPlayListSong={playListSong}
+                        handleLibrarySong={handleLibrarySong}
+                    />
+                ) : null;
             default:
                 return (
                     <>
@@ -188,7 +201,7 @@ const CenterHomePage = () => {
                                                 ]);
                                             }}>
                                             <div className="historyImage">
-                                                <img src={item.imageUrl} alt={item.title} />
+                                                <img src={item.imageUrl || NoAvatar} alt={item.title} />
                                             </div>
                                             <div className="nameHistorySong">{item.title}</div>
                                             <div className="playHistoryButton">
@@ -282,6 +295,35 @@ const CenterHomePage = () => {
                                             <img src={artist.urlAvatar} alt={artist.username} />
                                         </div>
                                         <div className="artistName">{artist.username || 'No name'}</div>
+                                    </div>
+                                ))}
+                            </Slider>
+                        </div>
+
+                        <div className="recommendContainer">
+                            <div className="recommendTitle">You might like</div>
+                            <Slider>
+                                {recommendSongs?.map((song) => (
+                                    <div
+                                        key={song.id}
+                                        className="recommendSongItem"
+                                        onContextMenu={(e) => {
+                                            handleLibrarySong(e, [
+                                                { type: 'playlist', id: song.id },
+                                                {
+                                                    type: 'artist',
+                                                    id: song.artistId,
+                                                },
+                                            ]);
+                                        }}>
+                                        <div className="recommendSongImage">
+                                            <img src={song.imageUrl || NoAvatar} alt={song.title} />
+                                        </div>
+                                        <div className="recommendSongTitle">{song.title}</div>
+                                        <p className="recommendSongArtist">{song.artistName || 'No name'}</p>
+                                        <div className="recommendPlayButton" onClick={(e) => listenSong(e, song.id)}>
+                                            <FontAwesomeIcon icon={faPlay} />
+                                        </div>
                                     </div>
                                 ))}
                             </Slider>

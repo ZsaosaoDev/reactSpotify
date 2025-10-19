@@ -99,13 +99,13 @@ async function getTrendingArtists(page = 0, size = 10, days = 7) {
 async function getArtistWithSongsAndAlbums(artistId) {
     try {
         const res = await api.get(`open/${artistId}/full`);
-        return res.data.content;
+        return res.data;
     } catch (err) {
         throw err;
     }
 }
 
-async function getListeningHistory(page = 0, size = 10) {
+async function getListeningHistory(page = 0, size = 8) {
     try {
         const res = await api.get('user/listening-history', {
             params: { page, size },
@@ -197,6 +197,24 @@ async function followedAlbumApi() {
     }
 }
 
+async function getPlaylistWithListSong(playlistId) {
+    try {
+        const res = await api.get(`user/${playlistId}`);
+        return res.data;
+    } catch (err) {
+        throw err;
+    }
+}
+
+async function getRecommendSongs() {
+    try {
+        const res = await api.get(`/user/recommend/songs`);
+        return res.data.content;
+    } catch (err) {
+        throw err;
+    }
+}
+
 export {
     uploadSong,
     getAllSongGenres,
@@ -218,4 +236,6 @@ export {
     followed,
     followedArtistApi,
     followedAlbumApi,
+    getPlaylistWithListSong,
+    getRecommendSongs,
 };

@@ -35,7 +35,10 @@
                     color: var(--white-lv1)
 
     .artistBody
-        margin-top: 30px
+        margin-top: 10px
+
+        .title
+            margin-top: 10px
 
         .artistSongList
             .artistSongItem
@@ -84,10 +87,48 @@
 
                 .artistSongDuration
                     line-height: 70px
-                
+
                 &.active
                     .artistSongRow
                         .artistPlayButton
                             color: var(--green-lv1)
+
                         .artistSongTitle
                             color: var(--green-lv1)
+
+    .artistAlbumList
+        .artistAlbumTabs
+            display: flex
+            flex-wrap: wrap
+            gap: 10px
+            padding: 8px 0
+
+            .albumTab
+                display: flex
+                flex-direction: column
+                align-items: center
+                cursor: pointer
+                padding: 4px
+                transition: transform 0.2s, box-shadow 0.2s
+                margin-top: 10px
+
+                &:hover
+                    transform: scale(1.05)
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15)
+
+
+                img
+                    width: 150px
+                    height: 150px
+                    object-fit: cover
+                    border-radius: 6px
+                    margin-bottom: 4px
+
+                span
+                    font-size: 12px
+                    text-align: center
+                    color: var(--text-normal)
+                    max-width: 70px
+                    overflow: hidden
+                    text-overflow: ellipsis
+                    white-space: nowrap
