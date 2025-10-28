@@ -1,13 +1,13 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
-import { IconLeftSong, IconRightSong, IconPlay, IconPause } from "~/assets/image/icons";
-import { setReduxIsPlaying, setReduxCurrentTime } from "~/redux/reducer/songNotWhitelistSlice";
-import { setReduxCurrentSongIndex } from "~/redux/reducer/songSlice";
-import { listenSong, calDurationSong } from "~/apis/songApi";
-import { isVideo } from "~/util/fileUtil";
+import { IconLeftSong, IconRightSong, IconPlay, IconPause } from '~/assets/image/icons';
+import { setReduxIsPlaying, setReduxCurrentTime } from '~/redux/reducer/songNotWhitelistSlice';
+import { setReduxCurrentSongIndex } from '~/redux/reducer/songSlice';
+import { listenSong, calDurationSong } from '~/apis/songApi';
+import { isVideo } from '~/util/fileUtil';
 import NoAvatar from '~/assets/image/noAvatar.png';
-import "./MusicPlayerBar.sass";
+import './MusicPlayerBar.sass';
 
 const MusicPlayerBar = () => {
     const [progress, setProgress] = useState(0);
@@ -60,7 +60,7 @@ const MusicPlayerBar = () => {
             // FIX: Chỉ call listenSong khi song thực sự thay đổi
             if (newSong?.song?.id && newSong.song.id !== prevSongIdRef.current?.songId) {
                 listenSong(newSong.song.id).catch((err) => {
-                    console.error("Error listening song:", err);
+                    console.error('Error listening song:', err);
                 });
                 prevSongIdRef.current = { songId: newSong.song.id, lastTime: 0 };
             }
@@ -86,17 +86,17 @@ const MusicPlayerBar = () => {
         });
     }, [reduxIsPlaying]);
 
-    // FIX: Auto-play khi song mới load
     useEffect(() => {
-        if (mediaRef.current && currentSong?.song?.mediaUrl) {
+        if (mediaRef.current && currentSong?.song?.id) {
             mediaRef.current.load();
             mediaRef.current.volume = volume;
+            mediaRef.current.currentTime = 0;
             setProgress(0);
 
             if (reduxIsPlaying) {
                 // Delay play to ensure media is loaded
                 const timer = setTimeout(() => {
-                    mediaRef.current?.play().catch(err => {
+                    mediaRef.current?.play().catch((err) => {
                         console.error('Auto-play error:', err);
                     });
                 }, 100);
@@ -104,7 +104,7 @@ const MusicPlayerBar = () => {
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentSong?.song?.mediaUrl]);
+    }, [currentSong?.song?.id]);
 
     // Cập nhật âm lượng
     useEffect(() => {
@@ -144,10 +144,9 @@ const MusicPlayerBar = () => {
     const trackListeningDuration = useCallback((songId) => {
         if (!songId) return;
 
-        calDurationSong(songId).catch(err => {
-            console.error("Error tracking duration:", err);
+        calDurationSong(songId).catch((err) => {
+            console.error('Error tracking duration:', err);
         });
-
     }, []);
 
     // FIX: Track duration khi switch song
@@ -174,8 +173,8 @@ const MusicPlayerBar = () => {
                     navigator.sendBeacon(url, data);
                 } else {
                     // Fallback cho browser cũ
-                    calDurationSong(currentSongId).catch(err => {
-                        console.error("Error tracking duration on unload:", err);
+                    calDurationSong(currentSongId).catch((err) => {
+                        console.error('Error tracking duration on unload:', err);
                     });
                 }
             }
@@ -194,7 +193,7 @@ const MusicPlayerBar = () => {
         if (currentSong?.song?.id) {
             trackListeningDuration(currentSong.song.id);
         }
-        dispatch(setReduxCurrentSongIndex("prev"));
+        dispatch(setReduxCurrentSongIndex('prev'));
     };
 
     const handleNext = () => {
@@ -202,31 +201,30 @@ const MusicPlayerBar = () => {
         if (currentSong?.song?.id) {
             trackListeningDuration(currentSong.song.id);
         }
-        dispatch(setReduxCurrentSongIndex("next"));
+        dispatch(setReduxCurrentSongIndex('next'));
     };
 
     // Track khi bài hát kết thúc tự nhiên (onEnded đã gọi handleNext, sẽ track ở đó)
 
     // FIX: Format time helper
     const formatTime = (seconds) => {
-        if (!seconds || isNaN(seconds)) return "0:00";
+        if (!seconds || isNaN(seconds)) return '0:00';
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
-        return `${mins}:${secs.toString().padStart(2, "0")}`;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
     return (
         <div className="musicPlayerBar">
             <div className="left">
                 <div className="currentSongImage">
-                    <img
-                        src={currentSong?.song?.imageUrl || NoAvatar}
-                        alt={currentSong?.song?.title || "No song"}
-                    />
+                    <img src={currentSong?.song?.imageUrl || NoAvatar} alt={currentSong?.song?.title || 'No song'} />
                 </div>
                 <div className="currentSongInfo">
-                    <div className="title">{currentSong?.song?.title || "No song selected"}</div>
-                    <div className="artist">{currentSong?.song?.artist || currentSong?.artist?.name || "No artist"}</div>
+                    <div className="title">{currentSong?.song?.title || 'No song selected'}</div>
+                    <div className="artist">
+                        {currentSong?.song?.artist || currentSong?.artist?.name || 'No artist'}
+                    </div>
                 </div>
             </div>
 
@@ -271,9 +269,7 @@ const MusicPlayerBar = () => {
                     </div>
 
                     <div className="bottomControll">
-                        <div className="currenTimeSong">
-                            {formatTime(mediaRef.current?.currentTime)}
-                        </div>
+                        <div className="currenTimeSong">{formatTime(mediaRef.current?.currentTime)}</div>
                         <div className="progress">
                             <input
                                 type="range"
@@ -281,7 +277,7 @@ const MusicPlayerBar = () => {
                                 max="100"
                                 step="0.1"
                                 value={progress}
-                                style={{ "--progress": `${progress}%` }}
+                                style={{ '--progress': `${progress}%` }}
                                 onMouseDown={handleSeekStart}
                                 onTouchStart={handleSeekStart}
                                 onChange={handleSeek}
@@ -290,9 +286,7 @@ const MusicPlayerBar = () => {
                                 disabled={!currentSong}
                             />
                         </div>
-                        <div className="duration">
-                            {formatTime(mediaRef.current?.duration)}
-                        </div>
+                        <div className="duration">{formatTime(mediaRef.current?.duration)}</div>
                     </div>
                 </div>
             </div>
@@ -306,7 +300,7 @@ const MusicPlayerBar = () => {
                         step="0.01"
                         value={volume}
                         onChange={handleVolumeChange}
-                        style={{ "--progress": `${volume * 100}%` }}
+                        style={{ '--progress': `${volume * 100}%` }}
                     />
                 </div>
             </div>

@@ -264,6 +264,26 @@ async function createAlbum(formData) {
     }
 }
 
+async function addSongToAlbum(albumId, songId) {
+    try {
+        const res = await api.post(`/artist/${albumId}/add-song/${songId}`);
+        return res.data;
+    } catch (err) {
+        console.error('Failed to add song to album:', err);
+        throw err;
+    }
+}
+
+async function deleteAlbum(albumId) {
+    try {
+        const res = await api.delete(`/artist/delete-album/${albumId}`);
+        return res.data;
+    } catch (err) {
+        console.error('Failed to delete album:', err);
+        throw err;
+    }
+}
+
 export {
     uploadSong,
     getAllSongGenres,
@@ -292,4 +312,6 @@ export {
     getMySongs,
     getMyAlbums,
     createAlbum,
+    addSongToAlbum,
+    deleteAlbum,
 };

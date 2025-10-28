@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { follow, unfollow, followedArtistApi, followedAlbumApi, deletePlaylist } from '~/apis/songApi';
+import { follow, unfollow, followedArtistApi, followedAlbumApi, deletePlaylist, deleteAlbum } from '~/apis/songApi';
 import { IconClose, IconFollow, IconPlusCircle, IconTriangle } from '~/assets/image/icons';
 import { setReduxRefresh } from '~/redux/reducer/songNotWhitelistSlice';
 
@@ -18,25 +18,16 @@ export const useMenuOptions = (reduxData, onNotification) => {
     useEffect(() => {
         const fetchFollowedData = async () => {
             try {
-                // Chỉ call API nếu cần thiết
                 const promises = [];
 
                 if (hasArtist) {
-                    promises.push(
-                        followedArtistApi().then((artists) => {
-                            setFollowedArtists(artists || []);
-                        })
-                    );
+                    promises.push(followedArtistApi().then((artists) => setFollowedArtists(artists || [])));
                 } else {
                     setFollowedArtists([]);
                 }
 
                 if (hasAlbum) {
-                    promises.push(
-                        followedAlbumApi().then((albums) => {
-                            setFollowedAlbums(albums || []);
-                        })
-                    );
+                    promises.push(followedAlbumApi().then((albums) => setFollowedAlbums(albums || [])));
                 } else {
                     setFollowedAlbums([]);
                 }
@@ -86,6 +77,29 @@ export const useMenuOptions = (reduxData, onNotification) => {
                         isPlaylistAction: true,
                     });
                     break;
+
+                case 'addSongPlaylist':
+                    options.push({
+                        label: (
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    width: '100%',
+                                }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <IconPlusCircle height={16} />
+                                    Add To Album
+                                </div>
+                                <IconTriangle height={16} />
+                            </div>
+                        ),
+                        action: null,
+                        isAlbumAction: true,
+                    });
+                    break;
+
                 case 'delePlaylist':
                     options.push({
                         label: (
@@ -97,10 +111,8 @@ export const useMenuOptions = (reduxData, onNotification) => {
                                     width: '100%',
                                 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <>
-                                        <IconClose height={16} />
-                                        Delete Playlist
-                                    </>
+                                    <IconClose height={16} />
+                                    Delete Playlist
                                 </div>
                             </div>
                         ),
@@ -121,6 +133,40 @@ export const useMenuOptions = (reduxData, onNotification) => {
                     });
                     break;
 
+                case 'deleAlbum':
+                    options.push({
+                        label: (
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    width: '100%',
+                                }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <IconClose height={16} />
+                                    Delete Album
+                                </div>
+                            </div>
+                        ),
+                        action: async () => {
+                            for (const item of reduxLibrarySong) {
+                                if (item.type === 'deleAlbum') {
+                                    try {
+                                        const res = await deleteAlbum(item.id);
+                                        dispatch(setReduxRefresh());
+                                        onNotification(res || 'Deleted album successfully');
+                                    } catch (e) {
+                                        onNotification('Failed to delete album or please login first');
+                                    }
+                                }
+                            }
+                        },
+                        isPlaylistAction: false,
+                    });
+                    break;
+
+                // 👤 Follow/Unfollow Artist
                 case 'artist':
                     const isFollowed = followedArtists.some((artist) => artist.id === id);
                     options.push({
@@ -171,12 +217,11 @@ export const useMenuOptions = (reduxData, onNotification) => {
                         },
                         isPlaylistAction: false,
                     });
-
                     break;
 
+                // 💽 Follow/Unfollow Album
                 case 'album':
                     const isAlbumFollowed = followedAlbums.some((album) => album.id === id);
-
                     options.push({
                         label: (
                             <div
@@ -190,11 +235,11 @@ export const useMenuOptions = (reduxData, onNotification) => {
                                     {isAlbumFollowed ? (
                                         <>
                                             <IconClose height={16} />
-                                            UnFollow Album
+                                            Unfollow Album
                                         </>
                                     ) : (
                                         <>
-                                            <IconPlusCircle height={16} />
+                                            <IconFollow height={16} />
                                             Follow Album
                                         </>
                                     )}

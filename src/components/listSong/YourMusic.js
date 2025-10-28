@@ -1,4 +1,4 @@
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -29,8 +29,9 @@ const YourMusic = ({ listenSong }) => {
         dispatch(setReduxLibrarySong(payload));
     };
 
+    const reduxRefresh = useSelector((state) => state.songNotWhite.reduxRefresh);
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchSongsAndAlbums = async () => {
             setIsLoading(true);
             try {
                 const [songsRes, albumsRes] = await Promise.all([getMySongs(), getMyAlbums()]);
@@ -38,16 +39,26 @@ const YourMusic = ({ listenSong }) => {
                 setAlbums(albumsRes || []);
             } catch (err) {
                 console.error('Failed to load music:', err);
-                setSongs([]);
-                setAlbums([]);
             } finally {
                 setIsLoading(false);
             }
         };
+        fetchSongsAndAlbums();
+    }, []); // chỉ chạy 1 lần khi component mount
 
-        fetchData();
-    }, []);
+    useEffect(() => {
+        const fetchAlbums = async () => {
+            try {
+                const albumsRes = await getMyAlbums();
+                setAlbums(albumsRes || []);
+            } catch (err) {
+                console.error('Failed to reload albums:', err);
+            }
+        };
+        fetchAlbums();
+    }, [reduxRefresh]);
 
+    // Tạo album mới
     const handleCreateAlbum = async (data) => {
         const formData = new FormData();
         formData.append('name', data.name);
@@ -79,11 +90,7 @@ const YourMusic = ({ listenSong }) => {
                         <div
                             key={song.id}
                             className="yourMusicCard"
-                            onContextMenu={(e) =>
-                                handleContext(e, [
-                                    // { type: 'playlist', id: song.id },
-                                ])
-                            }>
+                            onContextMenu={(e) => handleContext(e, [{ type: 'addSongPlaylist', id: song.id }])}>
                             <div className="yourMusicImage">
                                 <img src={song.imageUrl || NoAvatar} alt={song.title} />
                             </div>
@@ -112,7 +119,11 @@ const YourMusic = ({ listenSong }) => {
             ) : (
                 <div className="yourMusicSection">
                     {albums.map((album) => (
-                        <div key={album.id} className="yourMusicCard" onClick={() => navigate(`/album/${album.id}`)}>
+                        <div
+                            key={album.id}
+                            className="yourMusicCard"
+                            onClick={() => navigate(`/album/${album.id}`)}
+                            onContextMenu={(e) => handleContext(e, [{ type: 'deleAlbum', id: album.id }])}>
                             <div className="yourMusicImage">
                                 <img src={album.coverUrl || NoAvatar} alt={album.name} />
                             </div>
@@ -127,7 +138,7 @@ const YourMusic = ({ listenSong }) => {
             {showPopup && (
                 <CreatePopup
                     type="album"
-                    mess="Add new alum"
+                    mess="Add new album"
                     onClose={() => setShowPopup(false)}
                     onSubmit={handleCreateAlbum}
                 />

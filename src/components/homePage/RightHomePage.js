@@ -48,11 +48,11 @@ const RightHomePage = () => {
 
     // Load new media
     useEffect(() => {
-        if (mediaRef.current && currentSong?.song?.mediaUrl) {
+        if (mediaRef.current && currentSong?.song?.id) {
             mediaRef.current.load();
             lastSyncTimeRef.current = 0;
         }
-    }, [currentSong?.song?.mediaUrl]);
+    }, [currentSong?.song?.id]);
 
     // Sync play/pause
     useEffect(() => {
@@ -61,7 +61,7 @@ const RightHomePage = () => {
                 mediaRef.current.play().catch((err) => console.error('Right panel play error:', err));
             } else mediaRef.current.pause();
         }
-    }, [reduxIsPlaying, currentSong?.song?.mediaUrl]);
+    }, [reduxIsPlaying, currentSong?.song?.id]);
 
     const handleCloseRightPanel = () => dispatch(setReduxIsRight(false));
 
@@ -76,14 +76,26 @@ const RightHomePage = () => {
                             <button onClick={handleCloseRightPanel} className="closeButton">
                                 <IconRightArrowBox />
                             </button>
-                            <div className="imageTitle">{currentSong.artist?.name || currentSong.song?.artist || 'Chưa thuộc album'}</div>
+                            <div className="imageTitle">
+                                {currentSong.artist?.name || currentSong.song?.artist || 'Chưa thuộc album'}
+                            </div>
                         </div>
                         {currentSong.song?.mediaUrl && isVideo(currentSong.song.mediaUrl) ? (
                             <video ref={mediaRef} src={currentSong.song.mediaUrl} controls={false} muted playsInline />
                         ) : (
                             <>
-                                <img src={currentSong.song.imageUrl || NoAvatar} alt={currentSong.song.title} className="songImage" />
-                                <audio ref={mediaRef} src={currentSong.song.mediaUrl} controls={false} muted preload="metadata" />
+                                <img
+                                    src={currentSong.song.imageUrl || NoAvatar}
+                                    alt={currentSong.song.title}
+                                    className="songImage"
+                                />
+                                <audio
+                                    ref={mediaRef}
+                                    src={currentSong.song.mediaUrl}
+                                    controls={false}
+                                    muted
+                                    preload="metadata"
+                                />
                             </>
                         )}
                     </div>
@@ -91,8 +103,14 @@ const RightHomePage = () => {
                     <div className={`songInfoContainer ${isVideo(currentSong?.song?.mediaUrl) ? 'video' : 'audio'}`}>
                         <div className="songTitleContainer">{currentSong?.song?.title || 'Chưa có tiêu đề'}</div>
                         <div className="artistContainer">
-                            <img className="artistAvatar" src={currentSong.artist?.urlAvatar || NoAvatar} alt="artist-avatar" />
-                            <div className="artistName">{currentSong?.artist?.name || currentSong?.song?.artist || 'Unknown Artist'}</div>
+                            <img
+                                className="artistAvatar"
+                                src={currentSong.artist?.urlAvatar || NoAvatar}
+                                alt="artist-avatar"
+                            />
+                            <div className="artistName">
+                                {currentSong?.artist?.name || currentSong?.song?.artist || 'Unknown Artist'}
+                            </div>
                             <div className="artistActions">
                                 <div className="monthlyListeners">2,016,341 Monthly Listeners</div>
                                 <div className="followButton">Follow</div>
@@ -107,10 +125,16 @@ const RightHomePage = () => {
                         </div>
                         {nextSong ? (
                             <div className="nextSongContent">
-                                <img src={nextSong?.song?.imageUrl || NoAvatar} alt={nextSong?.song?.title || 'Unknown Song'} className="nextSongCover" />
+                                <img
+                                    src={nextSong?.song?.imageUrl || NoAvatar}
+                                    alt={nextSong?.song?.title || 'Unknown Song'}
+                                    className="nextSongCover"
+                                />
                                 <div className="nextSongDetails">
                                     <div className="nextSongTitle">{nextSong?.song?.title || 'Chưa có tiêu đề'}</div>
-                                    <div className="nextSongArtist">{nextSong?.artist?.name || nextSong?.song?.artist || 'Unknown Artist'}</div>
+                                    <div className="nextSongArtist">
+                                        {nextSong?.artist?.name || nextSong?.song?.artist || 'Unknown Artist'}
+                                    </div>
                                 </div>
                             </div>
                         ) : (

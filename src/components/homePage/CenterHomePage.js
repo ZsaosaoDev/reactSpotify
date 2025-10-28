@@ -59,7 +59,7 @@ const CenterHomePage = () => {
             }
         };
         fetchData();
-    }, []);
+    }, [location.pathname]);
 
     // ================== FETCH HISTORY ==================
     const updateHistory = useCallback(async () => {
@@ -90,10 +90,8 @@ const CenterHomePage = () => {
                 dispatch(setReduxIsRight(true));
                 dispatch(setReduxIsPlaying(true));
 
-                // Cập nhật lịch sử nghe
                 await updateHistory();
 
-                // 🔁 Cập nhật lại danh sách đề xuất sau khi nghe bài hát
                 const newRecommend = await getRecommendSongs();
                 setRecommendSongs(newRecommend);
             } catch (err) {
